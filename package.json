@@ -5,7 +5,8 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/bin/www.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/bin/www.js\""
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/bin/www.js\"",
+    "dev:debug": "concurrently \"npx tsc --watch\" \"nodemon --inspect -q dist/bin/www.js\""
   },
   "keywords": [],
   "author": "",
@@ -13,6 +14,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
+    "date-fns": "^2.29.3",
     "debug": "~2.6.9",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
