@@ -3,7 +3,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 
-import dotenv from "dotenv";
+import * as dotenv from "dotenv";
 import cors from "cors";
 
 import indexRouter from "./routes/index";

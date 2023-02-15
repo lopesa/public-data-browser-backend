@@ -6,9 +6,7 @@
 
 // var app = require("../dist/app");
 import app from "../app";
-var debug = require("debug")(
-  "api-collector-backend-express-genrator-example:server"
-);
+var debug = require("debug")("public-data-browser-backend:server");
 var http = require("http");
 
 /**
