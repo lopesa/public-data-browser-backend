@@ -16,6 +16,4 @@ const loggingFunction = (
   return logger("dev", { stream: accessLogStream });
 };
 
-// app.use(logger("dev"));
-
 export default loggingFunction;

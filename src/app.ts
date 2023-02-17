@@ -5,7 +5,7 @@ import corsMiddleware from "./middlewares/cors.middleware";
 import * as dotenv from "dotenv";
 
 import indexRouter from "./routes/index";
-import departmentOfAgricultureRouter from "./routes/department-of-agriculture";
+import departmentOfAgricultureRouter from "./routes/department-of-agriculture.router";
 
 dotenv.config();
 const app = express();
