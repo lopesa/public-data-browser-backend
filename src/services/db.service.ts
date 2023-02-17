@@ -1,5 +1,6 @@
 import { getXataClient } from "../configs/xata-custom-config";
 import { DatabaseSchema } from "../configs/xata";
+import mysql from "mysql";
 
 const xata = getXataClient();
 

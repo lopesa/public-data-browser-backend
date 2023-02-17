@@ -13,7 +13,11 @@ services:
     ports:
       - 3001:3001
       - 9229:9229
+    # networks:
+    #   - public-data-browser-network
     command: bash -c "npm install && npm run dev:debug"
+    # depends_on:
+    #   - db
   db:
     container_name: public_data_browser_db
     image: mysql:8.0
@@ -22,9 +26,11 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      # MYSQL_ROOT_PASSWORD: example
     volumes:
-      # - ./mysql:/var/lib/mysql
       - public-data-browser-data:/var/lib/mysql
+    # networks:
+    #   - public-data-browser-network
 volumes:
   public-data-browser-data:
+# networks:
+#   public-data-browser-network:
