@@ -1,0 +1,30 @@
+version: "3"
+services:
+  node:
+    container_name: public_data_browser_node
+    image: node:18
+    user: "node"
+    restart: always
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - 3001:3001
+      - 9229:9229
+    command: bash -c "npm install && npm run dev:debug"
+  db:
+    container_name: public_data_browser_db
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      # MYSQL_ROOT_PASSWORD: example
+    volumes:
+      # - ./mysql:/var/lib/mysql
+      - public-data-browser-data:/var/lib/mysql
+volumes:
+  public-data-browser-data:

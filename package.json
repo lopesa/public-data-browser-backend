@@ -6,7 +6,7 @@
     "build": "npx tsc",
     "start": "node dist/bin/www.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/bin/www.js\"",
-    "dev:debug": "concurrently \"npx tsc --watch\" \"nodemon --inspect -q dist/bin/www.js\""
+    "dev:debug": "concurrently \"npx tsc --watch\" \"nodemon --inspect=0.0.0.0:9229 -q dist/bin/www.js\""
   },
   "keywords": [],
   "author": "",
