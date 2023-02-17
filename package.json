@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "4.10.1",
+    "@prisma/client": "^4.10.1",
     "@types/detect-character-encoding": "^0.7.0",
     "@xata.io/client": "^0.22.1",
     "cookie-parser": "~1.4.4",

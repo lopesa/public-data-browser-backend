@@ -13,14 +13,11 @@ services:
     ports:
       - 3001:3001
       - 9229:9229
-    # networks:
-    #   - public-data-browser-network
     command: bash -c "npm install && npm run dev:debug"
-    # depends_on:
-    #   - db
   db:
     container_name: public_data_browser_db
     image: mysql:8.0
+    # platform: linux/amd64 #for platform error on Apple M1 chips
     ports:
       - 3306:3306
     restart: always
@@ -28,9 +25,5 @@ services:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     volumes:
       - public-data-browser-data:/var/lib/mysql
-    # networks:
-    #   - public-data-browser-network
 volumes:
   public-data-browser-data:
-# networks:
-#   public-data-browser-network:
