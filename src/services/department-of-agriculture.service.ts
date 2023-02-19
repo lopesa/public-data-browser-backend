@@ -8,6 +8,8 @@ const DOA_BASE_JSON_DATA_URL =
   "https://www.usda.gov/sites/default/files/documents/data.json";
 
 import { PrismaClient, Prisma } from "@prisma/client";
+// import { makeDbMethods } from "./db.service";
+import { dbCatchMethod } from "./db.service";
 
 const prisma = new PrismaClient();
 
@@ -86,19 +88,24 @@ export const fetchNewData = async () => {
     });
 };
 
-const dbCatchMethod = async (e: Error) => {
-  console.error(e);
-  await prisma.$disconnect();
-  process.exit(1);
-};
+// const dbCatchMethod = async (e: Error) => {
+//   console.error(e);
+//   await prisma.$disconnect();
+//   process.exit(1);
+// };
 
-const makeDbMethodsNew = () => {
+const makeDbMethods = () => {
   return {
     getAll: async () => {
       const item = await prisma.departmentOfAgricultureDataItem
         .findMany()
-        .catch(dbCatchMethod);
-      prisma.$disconnect();
+        // .catch(dbCatchMethod);
+        .catch(async (e) => {
+          await dbCatchMethod(e);
+          debugger;
+          throw e;
+        });
+      await prisma.$disconnect();
       return item;
     },
     create: async (data: Prisma.DepartmentOfAgricultureDataItemCreateInput) => {
@@ -106,8 +113,12 @@ const makeDbMethodsNew = () => {
         .create({
           data,
         })
-        .catch(dbCatchMethod);
-      prisma.$disconnect();
+        .catch(async (e) => {
+          await dbCatchMethod(e);
+          debugger;
+          throw e;
+        });
+      await prisma.$disconnect();
       return created;
     },
     createMany: async (
@@ -117,11 +128,28 @@ const makeDbMethodsNew = () => {
         .createMany({
           data,
         })
-        .catch(dbCatchMethod);
-      prisma.$disconnect();
+        .catch(async (e) => {
+          await dbCatchMethod(e);
+          debugger;
+          throw e;
+        });
+      await prisma.$disconnect();
       return created;
     },
   };
 };
 
-export const db = makeDbMethodsNew();
+export const db = makeDbMethods();
+
+export const getTitleAndDescriptionData = async () => {
+  const allData = await db.getAll().catch((e) => {
+    throw e;
+  });
+  const titleAndDescriptionData = allData.map((item) => {
+    return {
+      title: item.title,
+      description: item.description,
+    };
+  });
+  return titleAndDescriptionData;
+};

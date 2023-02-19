@@ -28,16 +28,46 @@ model DepartmentOfAgricultureDataItem {
   accessLevel String?
   contactPoint Json?
   programCode Json?
-  description String?
-  title       String?
+  description String? @db.LongText
+  title       String? @db.VarChar(500)
   distribution Json?
   license     String?
   bureauCode  Json?
-  modified    String?
+  modified    Json?
   publisher   Json?
   accrualPeriodicity String?
   keyword     Json?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
+  org        String?
+  vcard      String?
+  foaf       String?
+  dc       String?
+  pod       String?
+  skos       String?
+  describedBy Json?
+  downloadURL Json?
+  accessURL Json?
+  issued Json?
+  language Json?
+  rights String?
+  spatial String? @db.LongText
+  conformsTo Json?
+  temporal String?
+  format String?
+  homepage String?
+  dataQuality Boolean?
+  describedByType String?
+  primaryITInvestmentUII String?
+  fn String?
+  hasEmail String?
+  name String?
+  subOrganizationOf String?
+  landingPage String? @db.VarChar(500)
+  references Json?
+  theme Json?
+  systemOfRecords String?
+  isPartOf String?
+  @@index(fields: [title], map: "title_index")
 }

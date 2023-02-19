@@ -5,6 +5,7 @@ import {
   getShouldFetchNewData,
   fetchNewData,
   getCurrentDataFile,
+  getTitleAndDescriptionData,
 } from "../services/department-of-agriculture.service";
 
 const getDepartmentOfAgricultureData = async (
@@ -12,32 +13,37 @@ const getDepartmentOfAgricultureData = async (
   res: express.Response,
   next?: express.NextFunction
 ) => {
-  const shouldFetchNewData = await getShouldFetchNewData().catch((e) => {
-    res.status(500).send("Error fetching data");
+  const data = await getTitleAndDescriptionData().catch((e) => {
+    return res.status(500).send(e.message || "Error fetching data");
   });
-  if (shouldFetchNewData) {
-    await fetchNewData().catch((e) => {
-      res.status(500).send(e.message || "Error fetching data");
-    });
-  }
-  const currentDataFile = await getCurrentDataFile().catch((e) => {
-    res.status(500).send(e.message || "Error fetching data");
-  });
-  if (!currentDataFile) {
-    res.status(500).send("Error fetching data");
-  }
+  debugger;
+  return res.status(200).json(data);
+  // const shouldFetchNewData = await getShouldFetchNewData().catch((e) => {
+  //   res.status(500).send("Error fetching data");
+  // });
+  // if (shouldFetchNewData) {
+  //   await fetchNewData().catch((e) => {
+  //     res.status(500).send(e.message || "Error fetching data");
+  //   });
+  // }
+  // const currentDataFile = await getCurrentDataFile().catch((e) => {
+  //   res.status(500).send(e.message || "Error fetching data");
+  // });
+  // if (!currentDataFile) {
+  //   res.status(500).send("Error fetching data");
+  // }
 
-  const jsonDataBuffer = await fs.promises
-    .readFile(currentDataFile!)
-    .catch((e) => {
-      res.status(500).send(e.message || "Error fetching data");
-    });
+  // const jsonDataBuffer = await fs.promises
+  //   .readFile(currentDataFile!)
+  //   .catch((e) => {
+  //     res.status(500).send(e.message || "Error fetching data");
+  //   });
 
-  const stringData = jsonDataBuffer && jsonDataBuffer.toString();
+  // const stringData = jsonDataBuffer && jsonDataBuffer.toString();
 
-  return !!stringData
-    ? res.status(200).send(stringData)
-    : res.status(500).send("Error fetching data");
+  // return !!stringData
+  //   ? res.status(200).send(stringData)
+  //   : res.status(500).send("Error fetching data");
 };
 
 export const testPushDataToDb = async (
@@ -60,22 +66,24 @@ export const testPushDataToDb = async (
 
   const stringifiedData = jsonDataBuffer && jsonDataBuffer.toString();
   const jsonData = stringifiedData && JSON.parse(stringifiedData);
-  const testChunk = jsonData?.dataset.slice(0, 2);
-  // const result = await db.add(testChunk).catch((e) => {}
-  // const result = await db
-  //   .create({
-  //     title: "DepartmentOfAgricultureDataItem TEST400",
-  //     // description: "18testurl",
-  //   })
-  //   .catch((e) => {
-  //     debugger;
-  //   });
+  const longestDescription = jsonData?.dataset.reduce(
+    (acc: number, curr: any) => {
+      return curr.description.length > acc ? curr.description.length : acc;
+    },
+    0
+  );
   // debugger;
-  const result = await db.createMany(testChunk).catch((e) => {
-    debugger;
-    // @TODO: handle error
+  const testChunk = jsonData?.dataset.slice(0, 50);
+  // debugger;
+  const result = await db.createMany(jsonData.dataset).catch((e) => {
+    // debugger;
+    res.status(200).json(e.message);
   });
-  const all = await db.getAll();
+  const all = await db.getAll().catch((e) => {
+    // debugger;
+    res.status(200).json(e.message);
+  });
+  // debugger;
 
   return res.status(200).json(all);
 };
