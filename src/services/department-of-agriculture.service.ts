@@ -7,6 +7,10 @@ const MAX_HOURS_BEFORE_REFETCH = 24;
 const DOA_BASE_JSON_DATA_URL =
   "https://www.usda.gov/sites/default/files/documents/data.json";
 
+import { PrismaClient, Prisma } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
 export const getCurrentDataFile = async () => {
   const currentDataFiles = await fs.promises
     .readdir(`./${BASE_DIR}/${BASE_FOLDER}`)
@@ -81,3 +85,43 @@ export const fetchNewData = async () => {
       throw e;
     });
 };
+
+const dbCatchMethod = async (e: Error) => {
+  console.error(e);
+  await prisma.$disconnect();
+  process.exit(1);
+};
+
+const makeDbMethodsNew = () => {
+  return {
+    getAll: async () => {
+      const item = await prisma.departmentOfAgricultureDataItem
+        .findMany()
+        .catch(dbCatchMethod);
+      prisma.$disconnect();
+      return item;
+    },
+    create: async (data: Prisma.DepartmentOfAgricultureDataItemCreateInput) => {
+      const created = await prisma.departmentOfAgricultureDataItem
+        .create({
+          data,
+        })
+        .catch(dbCatchMethod);
+      prisma.$disconnect();
+      return created;
+    },
+    createMany: async (
+      data: Prisma.DepartmentOfAgricultureDataItemCreateInput[]
+    ) => {
+      const created = await prisma.departmentOfAgricultureDataItem
+        .createMany({
+          data,
+        })
+        .catch(dbCatchMethod);
+      prisma.$disconnect();
+      return created;
+    },
+  };
+};
+
+export const db = makeDbMethodsNew();
