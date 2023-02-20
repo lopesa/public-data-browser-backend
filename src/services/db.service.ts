@@ -8,10 +8,8 @@ const prisma = new PrismaClient();
 type DataTypes = Prisma.DepartmentOfAgricultureDataItemCreateInput;
 
 export const dbCatchMethod = async (e: Error) => {
-  debugger;
   console.error(e);
   await prisma.$disconnect();
-  debugger;
   return e;
   // process.exit(1); // DO I NEED THIS???!?!?!?!?!?
 };

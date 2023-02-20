@@ -3,6 +3,7 @@ import cookieParser from "cookie-parser";
 import loggingFunction from "./middlewares/logging.middleware";
 import corsMiddleware from "./middlewares/cors.middleware";
 import * as dotenv from "dotenv";
+import compression from "compression";
 
 import indexRouter from "./routes/index";
 import departmentOfAgricultureRouter from "./routes/department-of-agriculture.router";
@@ -11,6 +12,7 @@ dotenv.config();
 const app = express();
 
 app.use(corsMiddleware());
+app.use(compression());
 app.use(loggingFunction());
 
 app.use(express.json());

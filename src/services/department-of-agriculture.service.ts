@@ -88,21 +88,13 @@ export const fetchNewData = async () => {
     });
 };
 
-// const dbCatchMethod = async (e: Error) => {
-//   console.error(e);
-//   await prisma.$disconnect();
-//   process.exit(1);
-// };
-
 const makeDbMethods = () => {
   return {
     getAll: async () => {
       const item = await prisma.departmentOfAgricultureDataItem
         .findMany()
-        // .catch(dbCatchMethod);
         .catch(async (e) => {
           await dbCatchMethod(e);
-          debugger;
           throw e;
         });
       await prisma.$disconnect();
@@ -115,7 +107,6 @@ const makeDbMethods = () => {
         })
         .catch(async (e) => {
           await dbCatchMethod(e);
-          debugger;
           throw e;
         });
       await prisma.$disconnect();
@@ -130,7 +121,6 @@ const makeDbMethods = () => {
         })
         .catch(async (e) => {
           await dbCatchMethod(e);
-          debugger;
           throw e;
         });
       await prisma.$disconnect();
