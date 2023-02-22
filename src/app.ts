@@ -7,6 +7,7 @@ import compression from "compression";
 
 import indexRouter from "./routes/index";
 import departmentOfAgricultureRouter from "./routes/department-of-agriculture.router";
+import departmentOfEnergyRouter from "./routes/department-of-energy.router";
 
 dotenv.config();
 const app = express();
@@ -21,5 +22,6 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/department-of-agriculture", departmentOfAgricultureRouter);
+app.use("/department-of-energy", departmentOfEnergyRouter);
 
 export default app;

@@ -1,0 +1,4 @@
+export enum DataSources {
+  DEPARTMENT_OF_AGRICULTURE,
+  DEPARTMENT_OF_ENERGY,
+}

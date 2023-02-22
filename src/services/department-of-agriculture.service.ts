@@ -88,11 +88,31 @@ export const fetchNewData = async () => {
     });
 };
 
+// type DepartmentOfAgricultureDataItemFindUniqueArgs = {
+//   where: Prisma.DepartmentOfAgricultureDataItemWhereUniqueInput
+//   select?: Prisma.DepartmentOfAgricultureDataItemSelect | null
+//   include?: Prisma.Depa | null
+// }
+
 const makeDbMethods = () => {
   return {
     getAll: async () => {
-      const item = await prisma.departmentOfAgricultureDataItem
+      const items = await prisma.departmentOfAgricultureDataItem
         .findMany()
+        .catch(async (e) => {
+          await dbCatchMethod(e);
+          throw e;
+        });
+      await prisma.$disconnect();
+      return items;
+    },
+    getById: async (id: string) => {
+      const item = await prisma.departmentOfAgricultureDataItem
+        .findUniqueOrThrow({
+          where: {
+            id: id,
+          },
+        })
         .catch(async (e) => {
           await dbCatchMethod(e);
           throw e;
@@ -137,9 +157,17 @@ export const getTitleAndDescriptionData = async () => {
   });
   const titleAndDescriptionData = allData.map((item) => {
     return {
+      id: item.id,
       title: item.title,
       description: item.description,
     };
   });
   return titleAndDescriptionData;
+};
+
+export const getFullDataForItem = async (id: string) => {
+  const item = await db.getById(id).catch((e) => {
+    throw e;
+  });
+  return item;
 };
