@@ -96,9 +96,9 @@ export const fetchNewData = async () => {
 
 const makeDbMethods = () => {
   return {
-    getAll: async () => {
+    getAll: async (select?: Prisma.DepartmentOfAgricultureDataItemSelect) => {
       const items = await prisma.departmentOfAgricultureDataItem
-        .findMany()
+        .findMany({ select })
         .catch(async (e) => {
           await dbCatchMethod(e);
           throw e;
@@ -152,17 +152,15 @@ const makeDbMethods = () => {
 export const db = makeDbMethods();
 
 export const getTitleAndDescriptionData = async () => {
-  const allData = await db.getAll().catch((e) => {
+  const select = {
+    id: true,
+    title: true,
+    description: true,
+  };
+  const data = await db.getAll(select).catch((e) => {
     throw e;
   });
-  const titleAndDescriptionData = allData.map((item) => {
-    return {
-      id: item.id,
-      title: item.title,
-      description: item.description,
-    };
-  });
-  return titleAndDescriptionData;
+  return data;
 };
 
 export const getFullDataForItem = async (id: string) => {
