@@ -4,13 +4,15 @@ import { DataSources } from "../types/types-general";
 import fs from "fs";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
+import { getFileExtension } from "../utils/generalUtils";
+import { PartialBy } from "../types/types-helpers";
 
 const prisma = new PrismaClient();
 
 const db = {
   getAll: async (select?: Prisma.DepartmentOfEnergyDataItemSelect) => {
     const items = await prisma.departmentOfEnergyDataItem
-      .findMany()
+      .findMany({ select })
       .catch(async (e) => {
         await dbCatchMethod(e);
         throw e;
@@ -102,16 +104,69 @@ export const getDepartmentOfEnergyData = async () => {
   return items;
 };
 
-export const getTitleAndDescriptionData = async () => {
-  const select = {
+// this whole structure is explained here: https://stackoverflow.com/questions/68366105/get-full-type-on-prisma-client
+const titleDescriptionDistributionSelect =
+  Prisma.validator<Prisma.DepartmentOfEnergyDataItemSelect>()({
     id: true,
     title: true,
     description: true,
-  };
-  const data = await db.getAll(select).catch((e) => {
-    throw e;
+    distribution: true,
   });
-  return data;
+
+type TitleDescriptionDistributionPayload =
+  Prisma.DepartmentOfEnergyDataItemGetPayload<{
+    select: typeof titleDescriptionDistributionSelect;
+  }>;
+
+interface TitleDescriptionDistribution
+  extends TitleDescriptionDistributionPayload {
+  dataTypesByFileExtension?: string[];
+}
+
+type FinalReplyType = PartialBy<TitleDescriptionDistribution, "distribution">;
+
+export const getTitleAndDescriptionData = async () => {
+  const data = (await db
+    .getAll(titleDescriptionDistributionSelect)
+    .catch((e) => {
+      throw e;
+    })) as TitleDescriptionDistribution[];
+
+  data.forEach((item) => {
+    let dataTypesByFileExtension: string[] = [];
+    if (
+      item.distribution &&
+      typeof item.distribution === "object" &&
+      Array.isArray(item.distribution)
+    ) {
+      item.distribution.forEach((dist) => {
+        if (typeof dist === "object" && !Array.isArray(dist)) {
+          const distributionObject = dist as Prisma.JsonObject;
+          let distUrl =
+            distributionObject["downloadURL"] ||
+            distributionObject["accessURL"] ||
+            "";
+
+          let fileExtension;
+
+          if (typeof distUrl === "string") {
+            fileExtension = getFileExtension(distUrl);
+          }
+
+          typeof fileExtension === "string" &&
+            dataTypesByFileExtension.push(fileExtension);
+        }
+      });
+    }
+    item.dataTypesByFileExtension = dataTypesByFileExtension;
+  });
+
+  const returnVal: FinalReplyType[] = data.map((item) => {
+    const { ["distribution"]: remove, ...rest } = item;
+    return rest;
+  });
+
+  return returnVal;
 };
 
 export const getFullDataForItem = async (id: string) => {
