@@ -1,6 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { getCurrentDataFile } from "./data-files.service";
-import { DataSources } from "../types/types-general";
+import { DataSources, DataSourceMetadataRecord } from "../types/types-general";
 import fs from "fs";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
@@ -123,51 +123,73 @@ interface TitleDescriptionDistribution
   dataTypesByFileExtension?: string[];
 }
 
-type FinalReplyType = PartialBy<TitleDescriptionDistribution, "distribution">;
+type FinalDataReplyType = PartialBy<
+  TitleDescriptionDistribution,
+  "distribution"
+>;
 
-export const getTitleAndDescriptionData = async () => {
-  const data = (await db
-    .getAll(titleDescriptionDistributionSelect)
-    .catch((e) => {
-      throw e;
-    })) as TitleDescriptionDistribution[];
-
-  data.forEach((item) => {
-    let dataTypesByFileExtension: string[] = [];
-    if (
-      item.distribution &&
-      typeof item.distribution === "object" &&
-      Array.isArray(item.distribution)
-    ) {
-      item.distribution.forEach((dist) => {
-        if (typeof dist === "object" && !Array.isArray(dist)) {
-          const distributionObject = dist as Prisma.JsonObject;
-          let distUrl =
-            distributionObject["downloadURL"] ||
-            distributionObject["accessURL"] ||
-            "";
-
-          let fileExtension;
-
-          if (typeof distUrl === "string") {
-            fileExtension = getFileExtension(distUrl);
-          }
-
-          typeof fileExtension === "string" &&
-            dataTypesByFileExtension.push(fileExtension);
-        }
-      });
-    }
-    item.dataTypesByFileExtension = dataTypesByFileExtension;
-  });
-
-  const returnVal: FinalReplyType[] = data.map((item) => {
-    const { ["distribution"]: remove, ...rest } = item;
-    return rest;
-  });
-
-  return returnVal;
+type FinalFullReplyType = {
+  data: FinalDataReplyType[];
+  originalJsonDataUrl?: string;
+  originalIntialUrl?: string;
 };
+
+type GetTitleAndDescriptionDataReturnType = Promise<FinalFullReplyType>;
+
+export const getTitleAndDescriptionData =
+  async (): GetTitleAndDescriptionDataReturnType => {
+    const data = (await db
+      .getAll(titleDescriptionDistributionSelect)
+      .catch((e) => {
+        throw e;
+      })) as TitleDescriptionDistribution[];
+
+    data.forEach((item) => {
+      let dataTypesByFileExtension: string[] = [];
+      if (
+        item.distribution &&
+        typeof item.distribution === "object" &&
+        Array.isArray(item.distribution)
+      ) {
+        item.distribution.forEach((dist) => {
+          if (typeof dist === "object" && !Array.isArray(dist)) {
+            const distributionObject = dist as Prisma.JsonObject;
+            let distUrl =
+              distributionObject["downloadURL"] ||
+              distributionObject["accessURL"] ||
+              "";
+
+            let fileExtension;
+
+            if (typeof distUrl === "string") {
+              fileExtension = getFileExtension(distUrl);
+            }
+
+            typeof fileExtension === "string" &&
+              dataTypesByFileExtension.push(fileExtension);
+          }
+        });
+      }
+      item.dataTypesByFileExtension = dataTypesByFileExtension;
+    });
+
+    const dataReplyVal: FinalDataReplyType[] = data.map((item) => {
+      const { ["distribution"]: remove, ...rest } = item;
+      return rest;
+    });
+
+    const returnVal: FinalFullReplyType = {
+      data: dataReplyVal,
+      originalJsonDataUrl:
+        DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_ENERGY]
+          .originalJsonDataUrl,
+      originalIntialUrl:
+        DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_ENERGY]
+          .originalInitialUrl,
+    };
+
+    return returnVal;
+  };
 
 export const getFullDataForItem = async (id: string) => {
   const item = await db.getById(id).catch((e) => {
