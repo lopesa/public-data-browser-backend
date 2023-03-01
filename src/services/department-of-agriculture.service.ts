@@ -1,5 +1,7 @@
 import fs from "fs";
 import { diff_hours } from "../utils/generalUtils";
+import { getDataTypesByFileExtension } from "../utils/generalUtils";
+
 const BASE_DIR = "dist";
 const BASE_FOLDER = "json_data_external_sources";
 const BASE_JSON_FILE_NAME = "DEPARTMENT_OF_AGRICULTURE_BASE_DATA_";
@@ -10,6 +12,7 @@ const DOA_BASE_JSON_DATA_URL =
 import { PrismaClient, Prisma } from "@prisma/client";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
+import { DataSourceMetadataRecord, DataSources } from "../types/types-general";
 
 const prisma = new PrismaClient();
 
@@ -88,12 +91,6 @@ export const fetchNewData = async () => {
     });
 };
 
-// type DepartmentOfAgricultureDataItemFindUniqueArgs = {
-//   where: Prisma.DepartmentOfAgricultureDataItemWhereUniqueInput
-//   select?: Prisma.DepartmentOfAgricultureDataItemSelect | null
-//   include?: Prisma.Depa | null
-// }
-
 const makeDbMethods = () => {
   return {
     getAll: async (select?: Prisma.DepartmentOfAgricultureDataItemSelect) => {
@@ -151,16 +148,59 @@ const makeDbMethods = () => {
 
 export const db = makeDbMethods();
 
-export const getTitleAndDescriptionData = async () => {
-  const select = {
+const titleDescriptionDistributionSelect =
+  Prisma.validator<Prisma.DepartmentOfAgricultureDataItemSelect>()({
     id: true,
     title: true,
     description: true,
-  };
-  const data = await db.getAll(select).catch((e) => {
-    throw e;
+    distribution: true,
   });
-  return data;
+
+type TitleDescriptionDistributionPayload =
+  Prisma.DepartmentOfAgricultureDataItemGetPayload<{
+    select: typeof titleDescriptionDistributionSelect;
+  }>;
+
+interface TitleDescriptionDistribution
+  extends TitleDescriptionDistributionPayload {
+  dataTypesByFileExtension?: string[];
+}
+
+export const getTitleAndDescriptionData = async () => {
+  const data = (await db
+    .getAll(titleDescriptionDistributionSelect)
+    .catch((e) => {
+      throw e;
+    })) as TitleDescriptionDistribution[];
+
+  data.forEach((item) => {
+    if (
+      item.distribution &&
+      typeof item.distribution === "object" &&
+      Array.isArray(item.distribution)
+    ) {
+      item.dataTypesByFileExtension = getDataTypesByFileExtension(
+        item.distribution
+      );
+    } else {
+      item.dataTypesByFileExtension = [];
+    }
+  });
+  const dataReplyVal = data.map((item) => {
+    const { ["distribution"]: remove, ...rest } = item;
+    return rest;
+  });
+  const returnVal = {
+    data: dataReplyVal,
+    originalJsonDataUrl:
+      DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_AGRICULTURE]
+        .originalJsonDataUrl,
+    originalIntialUrl:
+      DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_AGRICULTURE]
+        .originalInitialUrl,
+  };
+
+  return returnVal;
 };
 
 export const getFullDataForItem = async (id: string) => {

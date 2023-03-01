@@ -4,7 +4,7 @@ import { DataSources, DataSourceMetadataRecord } from "../types/types-general";
 import fs from "fs";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
-import { getFileExtension } from "../utils/generalUtils";
+import { getDataTypesByFileExtension } from "../utils/generalUtils";
 import { PartialBy } from "../types/types-helpers";
 
 const prisma = new PrismaClient();
@@ -145,32 +145,17 @@ export const getTitleAndDescriptionData =
       })) as TitleDescriptionDistribution[];
 
     data.forEach((item) => {
-      let dataTypesByFileExtension: string[] = [];
       if (
         item.distribution &&
         typeof item.distribution === "object" &&
         Array.isArray(item.distribution)
       ) {
-        item.distribution.forEach((dist) => {
-          if (typeof dist === "object" && !Array.isArray(dist)) {
-            const distributionObject = dist as Prisma.JsonObject;
-            let distUrl =
-              distributionObject["downloadURL"] ||
-              distributionObject["accessURL"] ||
-              "";
-
-            let fileExtension;
-
-            if (typeof distUrl === "string") {
-              fileExtension = getFileExtension(distUrl);
-            }
-
-            typeof fileExtension === "string" &&
-              dataTypesByFileExtension.push(fileExtension);
-          }
-        });
+        item.dataTypesByFileExtension = getDataTypesByFileExtension(
+          item.distribution
+        );
+      } else {
+        item.dataTypesByFileExtension = [];
       }
-      item.dataTypesByFileExtension = dataTypesByFileExtension;
     });
 
     const dataReplyVal: FinalDataReplyType[] = data.map((item) => {
