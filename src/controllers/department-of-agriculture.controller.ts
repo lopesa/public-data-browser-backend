@@ -1,5 +1,7 @@
+import { DepartmentOfAgricultureDataItem } from "@prisma/client";
 import express from "express";
 import fs from "fs";
+import { checkForNulls } from "../services/data-management.service";
 import {
   db,
   getShouldFetchNewData,
@@ -7,16 +9,19 @@ import {
   getCurrentDataFile,
   getTitleAndDescriptionData,
   getFullDataForItem,
+  getDepartmentOfAgricultureData,
 } from "../services/department-of-agriculture.service";
 
-const getDepartmentOfAgricultureData = async (
+export const getInitialDepartmentOfAgricultureData = async (
   req: express.Request,
   res: express.Response
 ) => {
   const data = await getTitleAndDescriptionData().catch((e) => {
-    return res.status(500).send(e.message || "Error fetching data");
+    throw e;
+    // return res.status(500).send(e.message || "Error fetching data");
   });
-  return res.status(200).json(data);
+  return data;
+  // return res.status(200).json(data);
 };
 
 export const getDepartmentOfAgricultureDataItem = async (
@@ -31,6 +36,22 @@ export const getDepartmentOfAgricultureDataItem = async (
     return res.status(500).send(e.message || "Error fetching data");
   });
   return res.status(200).json(data);
+};
+
+export const checkTableForNulls = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const data = (await getDepartmentOfAgricultureData().catch((e) => {
+    throw e;
+  })) as DepartmentOfAgricultureDataItem[];
+
+  try {
+    const nulls = checkForNulls(data);
+    return nulls;
+  } catch (e) {
+    throw e;
+  }
 };
 
 // export const testPushDataToDb = async (
@@ -69,5 +90,3 @@ export const getDepartmentOfAgricultureDataItem = async (
 
 //   return res.status(200).json(all);
 // };
-
-export default getDepartmentOfAgricultureData;

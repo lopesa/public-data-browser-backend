@@ -8,7 +8,7 @@ import {
   getTitleAndDescriptionData,
 } from "../services/department-of-energy.service";
 import { DepartmentOfEnergyDataItem } from "@prisma/client";
-
+import { checkForNulls } from "../services/data-management.service";
 export const getNewDepartmentOfEnergyDataFromSource = async (
   req: express.Request,
   res: express.Response
@@ -37,33 +37,31 @@ export const addSourceDataToDb = async (
   return data;
 };
 
-export const getAllDepartmentOfEnergyData = async (
+export const getInitialDepartmentOfEnergyData = async (
   req: express.Request,
   res: express.Response
 ) => {
   const data = await getTitleAndDescriptionData().catch((e) => {
     throw e;
   });
-
-  // const checkForNulls = (data: DepartmentOfEnergyDataItem[]) => {
-  //   let nulls: any = {};
-  //   data.forEach(item => {
-  //     for (const key in item) {
-  //       if (nulls[key] === 2) {
-  //         return
-  //       }
-  //       if (nulls[key] === 1) {
-  //         nulls[key] = 2;
-  //       }
-  //       if (item[key as keyof DepartmentOfEnergyDataItem] === null) {
-
-  //         // nulls[key] = nulls[key] ? nulls[key] + 1 : 1;
-  //       }
-  //     }
-  //   })
-
-  // }
   return data;
+};
+
+// export const getAllDepartmentOfEnergyData = async (
+export const checkTableForNulls = async (
+  req: express.Request,
+  res: express.Response
+) => {
+  const data = (await getDepartmentOfEnergyData().catch((e) => {
+    throw e;
+  })) as DepartmentOfEnergyDataItem[];
+
+  try {
+    const nulls = checkForNulls(data);
+    return nulls;
+  } catch (e) {
+    throw e;
+  }
 };
 
 export const getDepartmentOfEnergyDataItem = async (

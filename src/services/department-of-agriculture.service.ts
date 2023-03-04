@@ -209,3 +209,10 @@ export const getFullDataForItem = async (id: string) => {
   });
   return item;
 };
+
+export const getDepartmentOfAgricultureData = async () => {
+  const items = await db.getAll().catch((e) => {
+    throw e;
+  });
+  return items;
+};
