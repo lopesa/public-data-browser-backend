@@ -24,4 +24,16 @@ app.use("/", indexRouter);
 app.use("/department-of-agriculture", departmentOfAgricultureRouter);
 app.use("/department-of-energy", departmentOfEnergyRouter);
 
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack);
+    res.status(500).send(err?.stack || "Something broke!");
+  }
+);
+
 export default app;

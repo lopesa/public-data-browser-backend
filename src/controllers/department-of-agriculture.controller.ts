@@ -11,6 +11,7 @@ import {
   getFullDataForItem,
   getDepartmentOfAgricultureData,
 } from "../services/department-of-agriculture.service";
+import validator from "validator";
 
 export const getInitialDepartmentOfAgricultureData = async (
   req: express.Request,
@@ -29,13 +30,14 @@ export const getDepartmentOfAgricultureDataItem = async (
   res: express.Response
 ) => {
   const id = req.params.id;
-  if (!id) {
-    return res.status(400).send("Missing id");
+  if (!validator.isUUID(id)) {
+    throw new Error("Invalid ID");
+  } else {
+    const data = await getFullDataForItem(id).catch((e) => {
+      throw e || new Error("Error fetching data from db");
+    });
+    return data;
   }
-  const data = await getFullDataForItem(id).catch((e) => {
-    return res.status(500).send(e.message || "Error fetching data");
-  });
-  return res.status(200).json(data);
 };
 
 export const checkTableForNulls = async (

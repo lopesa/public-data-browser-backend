@@ -5,7 +5,6 @@ import {
   getDepartmentOfAgricultureDataItem,
 } from "../controllers/department-of-agriculture.controller";
 import { checkTableForNulls } from "../controllers/department-of-agriculture.controller";
-import validator from "validator";
 
 router.get("/", async (req: express.Request, res: express.Response) => {
   const data = await getInitialDepartmentOfAgricultureData(req, res).catch(
@@ -29,14 +28,21 @@ router.get(
   }
 );
 
-router.get("/:id", async (req: express.Request, res: express.Response) => {
-  if (!validator.isUUID(req.params.id)) {
-    return res.status(500).send("Invalid id");
+router.get(
+  "/:id",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const data = await getDepartmentOfAgricultureDataItem(req, res).catch(
+      (e) => {
+        next(e || new Error("Error fetching data"));
+      }
+    );
+    data ? res.status(200).json(data) : next();
   }
-  await getDepartmentOfAgricultureDataItem(req, res).catch((e) => {
-    return res.status(500).send(e.message || "Error fetching data");
-  });
-});
+);
 
 // router.get("/test", async (req: express.Request, res: express.Response) => {
 //   await testPushDataToDb(req, res).catch((e) => {

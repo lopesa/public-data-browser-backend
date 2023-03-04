@@ -9,7 +9,11 @@ const MAX_HOURS_BEFORE_REFETCH = 24;
 const DOA_BASE_JSON_DATA_URL =
   "https://www.usda.gov/sites/default/files/documents/data.json";
 
-import { PrismaClient, Prisma } from "@prisma/client";
+import {
+  PrismaClient,
+  Prisma,
+  DepartmentOfAgricultureDataItem,
+} from "@prisma/client";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
 import { DataSourceMetadataRecord, DataSources } from "../types/types-general";
@@ -203,7 +207,9 @@ export const getTitleAndDescriptionData = async () => {
   return returnVal;
 };
 
-export const getFullDataForItem = async (id: string) => {
+export const getFullDataForItem = async (
+  id: string
+): Promise<DepartmentOfAgricultureDataItem | never> => {
   const item = await db.getById(id).catch((e) => {
     throw e;
   });
