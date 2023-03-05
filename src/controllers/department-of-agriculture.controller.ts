@@ -1,29 +1,18 @@
-import { DepartmentOfAgricultureDataItem } from "@prisma/client";
 import express from "express";
-import fs from "fs";
-import { checkForNulls } from "../services/data-management.service";
 import {
-  db,
-  getShouldFetchNewData,
-  fetchNewData,
-  getCurrentDataFile,
-  getTitleAndDescriptionData,
+  getInitialData,
   getFullDataForItem,
-  getDepartmentOfAgricultureData,
 } from "../services/department-of-agriculture.service";
 import validator from "validator";
+import { USGovernmentInitialDataItem } from "../types/types-general";
 
-export const getInitialDepartmentOfAgricultureData = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  const data = await getTitleAndDescriptionData().catch((e) => {
-    throw e;
-    // return res.status(500).send(e.message || "Error fetching data");
-  });
-  return data;
-  // return res.status(200).json(data);
-};
+export const getInitialDepartmentOfAgricultureData =
+  async (): Promise<USGovernmentInitialDataItem> => {
+    const data = await getInitialData().catch((e) => {
+      throw e;
+    });
+    return data;
+  };
 
 export const getDepartmentOfAgricultureDataItem = async (
   req: express.Request,
@@ -40,21 +29,21 @@ export const getDepartmentOfAgricultureDataItem = async (
   }
 };
 
-export const checkTableForNulls = async (
-  req: express.Request,
-  res: express.Response
-) => {
-  const data = (await getDepartmentOfAgricultureData().catch((e) => {
-    throw e;
-  })) as DepartmentOfAgricultureDataItem[];
+// export const checkTableForNulls = async (
+//   req: express.Request,
+//   res: express.Response
+// ) => {
+//   const data = (await getDepartmentOfAgricultureData().catch((e) => {
+//     throw e;
+//   })) as DepartmentOfAgricultureDataItem[];
 
-  try {
-    const nulls = checkForNulls(data);
-    return nulls;
-  } catch (e) {
-    throw e;
-  }
-};
+//   try {
+//     const nulls = checkForNulls(data);
+//     return nulls;
+//   } catch (e) {
+//     throw e;
+//   }
+// };
 
 // export const testPushDataToDb = async (
 //   req: express.Request,

@@ -152,30 +152,27 @@ const makeDbMethods = () => {
 
 export const db = makeDbMethods();
 
-const titleDescriptionDistributionSelect =
+const initialDataSelect =
   Prisma.validator<Prisma.DepartmentOfAgricultureDataItemSelect>()({
     id: true,
     title: true,
     description: true,
     distribution: true,
+    spatial: true,
   });
 
-type TitleDescriptionDistributionPayload =
-  Prisma.DepartmentOfAgricultureDataItemGetPayload<{
-    select: typeof titleDescriptionDistributionSelect;
-  }>;
+type InitialDataPayload = Prisma.DepartmentOfAgricultureDataItemGetPayload<{
+  select: typeof initialDataSelect;
+}>;
 
-interface TitleDescriptionDistribution
-  extends TitleDescriptionDistributionPayload {
+interface InitialData extends InitialDataPayload {
   dataTypesByFileExtension?: string[];
 }
 
-export const getTitleAndDescriptionData = async () => {
-  const data = (await db
-    .getAll(titleDescriptionDistributionSelect)
-    .catch((e) => {
-      throw e;
-    })) as TitleDescriptionDistribution[];
+export const getInitialData = async () => {
+  const data = (await db.getAll(initialDataSelect).catch((e) => {
+    throw e;
+  })) as InitialData[];
 
   data.forEach((item) => {
     if (

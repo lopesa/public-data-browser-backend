@@ -21,3 +21,15 @@ export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
       originalInitialUrl: "https://data.gov/metrics.html",
     },
   };
+
+export type USGovernmentInitialDataItem = {
+  data: {
+    dataTypesByFileExtension?: string[] | undefined;
+    id: string;
+    description: string | null;
+    title: string | null;
+    spatial: string | null;
+  }[];
+  originalJsonDataUrl: string;
+  originalIntialUrl: string | undefined;
+};
