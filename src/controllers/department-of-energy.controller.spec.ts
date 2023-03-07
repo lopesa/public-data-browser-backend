@@ -1,9 +1,9 @@
 import request from "supertest";
 import {
-  getDepartmentOfAgricultureDataItem,
-  getInitialDepartmentOfAgricultureData,
-} from "../controllers/department-of-agriculture.controller";
-import * as DepartmentOfAgricultureService from "../services/department-of-agriculture.service";
+  getDepartmentOfEnergyDataItem,
+  getInitialDepartmentOfEnergyData,
+} from "./department-of-energy.controller";
+import * as DepartmentOfEnergyService from "../services/department-of-energy.service";
 import { expect, jest, test } from "@jest/globals";
 import {
   mockUSGovernmentInitialDataItem,
@@ -11,40 +11,39 @@ import {
 } from "../mocks";
 import { v4 as uuidv4 } from "uuid";
 import validator from "validator";
+import { DepartmentOfEnergyDataItem } from "@prisma/client";
 
-describe("Department of Agriculture Controller", () => {
-  describe("getInitialDepartmentOfAgricultureData", () => {
+describe("Department of Energy Controller", () => {
+  describe("getInitialDepartmentOfEnergyData", () => {
     it("should call into DOAService.getInitialData", async () => {
       const getFullDataForItemSpy = jest
-        .spyOn(DepartmentOfAgricultureService, "getInitialData")
+        .spyOn(DepartmentOfEnergyService, "getInitialData")
         .mockImplementation(() => Promise.resolve(mockUSGovernmentInitialData));
-      await getInitialDepartmentOfAgricultureData().catch((e) => {});
+      await getInitialDepartmentOfEnergyData().catch((e) => {});
       expect(getFullDataForItemSpy).toHaveBeenCalled();
     });
     it("should throw an error if getInitialData throws an error", async () => {
       jest
-        .spyOn(DepartmentOfAgricultureService, "getInitialData")
+        .spyOn(DepartmentOfEnergyService, "getInitialData")
         .mockImplementation(() =>
           Promise.reject(
             new Error("Error fetching data from db: getInitialData")
           )
         );
-      await getInitialDepartmentOfAgricultureData().catch((e) => {
+      await getInitialDepartmentOfEnergyData().catch((e) => {
         expect(e.message).toBe("Error fetching data from db: getInitialData");
       });
     });
     it("should return the data from getInitialData", async () => {
       jest
-        .spyOn(DepartmentOfAgricultureService, "getInitialData")
+        .spyOn(DepartmentOfEnergyService, "getInitialData")
         .mockImplementation(() => Promise.resolve(mockUSGovernmentInitialData));
-      const data = await getInitialDepartmentOfAgricultureData().catch(
-        (e) => {}
-      );
+      const data = await getInitialDepartmentOfEnergyData().catch((e) => {});
       expect(data).toEqual(mockUSGovernmentInitialData);
     });
   });
 
-  describe("getDepartmentOfAgricultureDataItem", () => {
+  describe("getDepartmentOfEnergyDataItem", () => {
     beforeEach(() => {
       jest.resetAllMocks();
     });
@@ -53,27 +52,29 @@ describe("Department of Agriculture Controller", () => {
       let mReq: any = { params: { id: "" } };
       const mRes: any = {};
       const mNext = jest.fn();
-      await getDepartmentOfAgricultureDataItem(mReq, mRes).catch((e) => {
+      await getDepartmentOfEnergyDataItem(mReq, mRes).catch((e) => {
         expect(e.message).toBe("Invalid ID");
       });
 
       mReq = { params: { id: "not a uuid so invalid" } };
-      await getDepartmentOfAgricultureDataItem(mReq, mRes).catch((e) => {
+      await getDepartmentOfEnergyDataItem(mReq, mRes).catch((e) => {
         expect(e.message).toBe("Invalid ID");
       });
     });
 
-    it("should call into DOAService.getFullDataForItem with the id param", async () => {
+    it("should call into DOEservice.getFullDataForItem with the id param", async () => {
       const validUuid = uuidv4();
       const mReq: any = { params: { id: validUuid } };
       const mRes: any = {};
       const mNext = jest.fn();
       const getFullDataForItemSpy = jest
-        .spyOn(DepartmentOfAgricultureService, "getFullDataForItem")
+        .spyOn(DepartmentOfEnergyService, "getFullDataForItem")
         .mockImplementation(() =>
-          Promise.resolve(mockUSGovernmentInitialDataItem)
+          Promise.resolve(
+            mockUSGovernmentInitialDataItem as DepartmentOfEnergyDataItem
+          )
         );
-      await getDepartmentOfAgricultureDataItem(mReq, mRes).catch((e) => {});
+      await getDepartmentOfEnergyDataItem(mReq, mRes).catch((e) => {});
       expect(getFullDataForItemSpy).toHaveBeenCalledWith(validUuid);
     });
 
@@ -82,11 +83,11 @@ describe("Department of Agriculture Controller", () => {
       const mReq: any = { params: { id: validUuid } };
       const mRes: any = {};
       const getFullDataForItemSpy = jest
-        .spyOn(DepartmentOfAgricultureService, "getFullDataForItem")
+        .spyOn(DepartmentOfEnergyService, "getFullDataForItem")
         .mockImplementation(() =>
           Promise.reject(new Error("Error fetching data from db"))
         );
-      await getDepartmentOfAgricultureDataItem(mReq, mRes).catch((e) => {
+      await getDepartmentOfEnergyDataItem(mReq, mRes).catch((e) => {
         expect(e.message).toBe("Error fetching data from db");
       });
     });
@@ -96,11 +97,13 @@ describe("Department of Agriculture Controller", () => {
       const mReq: any = { params: { id: validUuid } };
       const mRes: any = {};
       const getFullDataForItemSpy = jest
-        .spyOn(DepartmentOfAgricultureService, "getFullDataForItem")
+        .spyOn(DepartmentOfEnergyService, "getFullDataForItem")
         .mockImplementation(() =>
-          Promise.resolve(mockUSGovernmentInitialDataItem)
+          Promise.resolve(
+            mockUSGovernmentInitialDataItem as DepartmentOfEnergyDataItem
+          )
         );
-      const data = await getDepartmentOfAgricultureDataItem(mReq, mRes).catch(
+      const data = await getDepartmentOfEnergyDataItem(mReq, mRes).catch(
         (e) => {}
       );
       expect(data).toEqual(mockUSGovernmentInitialDataItem);

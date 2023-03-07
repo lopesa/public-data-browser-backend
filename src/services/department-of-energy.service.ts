@@ -1,11 +1,21 @@
-import { PrismaClient, Prisma } from "@prisma/client";
+import {
+  PrismaClient,
+  Prisma,
+  DepartmentOfEnergyDataItem,
+} from "@prisma/client";
 import { getCurrentDataFile } from "./data-files.service";
-import { DataSources, DataSourceMetadataRecord } from "../types/types-general";
+import {
+  DataSources,
+  DataSourceMetadataRecord,
+  InitialIndexData,
+  InitialIndexDataItem,
+} from "../types/types-general";
 import fs from "fs";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
 import { getDataTypesByFileExtension } from "../utils/generalUtils";
 import { PartialBy } from "../types/types-helpers";
+import { parseDataItemForIndexDataForUSGovData } from "./data-management.service";
 
 const prisma = new PrismaClient();
 
@@ -97,6 +107,9 @@ export const addSourceDataToDbService = async () => {
   //   return res.status(200).json(all);
 };
 
+/**
+ * getall call to db with no selector, returns everything
+ */
 export const getDepartmentOfEnergyData = async () => {
   const items = await db.getAll().catch((e) => {
     throw e;
@@ -104,79 +117,66 @@ export const getDepartmentOfEnergyData = async () => {
   return items;
 };
 
-// this whole structure is explained here: https://stackoverflow.com/questions/68366105/get-full-type-on-prisma-client
-const titleDescriptionDistributionSelect =
+/**
+ * setup for getInitialData call below
+ * This is the initial data that is used to populate the index page
+ * for this data souce
+ */
+const initialDataSelect =
   Prisma.validator<Prisma.DepartmentOfEnergyDataItemSelect>()({
     id: true,
     title: true,
     description: true,
     distribution: true,
+    spatial: true,
   });
 
-type TitleDescriptionDistributionPayload =
-  Prisma.DepartmentOfEnergyDataItemGetPayload<{
-    select: typeof titleDescriptionDistributionSelect;
-  }>;
+type InitialDataPayload = Prisma.DepartmentOfEnergyDataItemGetPayload<{
+  select: typeof initialDataSelect;
+}>;
 
-interface TitleDescriptionDistribution
-  extends TitleDescriptionDistributionPayload {
+export interface DepartmentOfEnergyIndexDataItem extends InitialDataPayload {
   dataTypesByFileExtension?: string[];
 }
 
-type FinalDataReplyType = PartialBy<
-  TitleDescriptionDistribution,
-  "distribution"
->;
+/**
+ *
+ * @returns Dept of Energy getAll call to db parsed back as
+ * the type: InitialIndexDataItem[] which should be kept
+ * common across all data sources
+ */
+export const getInitialData = async (): Promise<InitialIndexData> => {
+  const data = (await db.getAll(initialDataSelect).catch((e) => {
+    throw e;
+  })) as DepartmentOfEnergyIndexDataItem[];
 
-type FinalFullReplyType = {
-  data: FinalDataReplyType[];
-  originalJsonDataUrl?: string;
-  originalIntialUrl?: string;
-};
+  let parsedData: InitialIndexDataItem[] = [];
 
-type GetTitleAndDescriptionDataReturnType = Promise<FinalFullReplyType>;
+  data.forEach((item) => {
+    parsedData.push(parseDataItemForIndexDataForUSGovData(item));
+  });
 
-export const getTitleAndDescriptionData =
-  async (): GetTitleAndDescriptionDataReturnType => {
-    const data = (await db
-      .getAll(titleDescriptionDistributionSelect)
-      .catch((e) => {
-        throw e;
-      })) as TitleDescriptionDistribution[];
-
-    data.forEach((item) => {
-      if (
-        item.distribution &&
-        typeof item.distribution === "object" &&
-        Array.isArray(item.distribution)
-      ) {
-        item.dataTypesByFileExtension = getDataTypesByFileExtension(
-          item.distribution
-        );
-      } else {
-        item.dataTypesByFileExtension = [];
-      }
-    });
-
-    const dataReplyVal: FinalDataReplyType[] = data.map((item) => {
-      const { ["distribution"]: remove, ...rest } = item;
-      return rest;
-    });
-
-    const returnVal: FinalFullReplyType = {
-      data: dataReplyVal,
-      originalJsonDataUrl:
-        DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_ENERGY]
-          .originalJsonDataUrl,
-      originalIntialUrl:
-        DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_ENERGY]
-          .originalInitialUrl,
-    };
-
-    return returnVal;
+  const returnVal = {
+    data: parsedData,
+    originalJsonDataUrl:
+      DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_ENERGY]
+        .originalJsonDataUrl,
+    originalIntialUrl:
+      DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_ENERGY]
+        .originalInitialUrl,
   };
 
-export const getFullDataForItem = async (id: string) => {
+  return returnVal;
+};
+
+/**
+ *
+ * @param id
+ * @returns full data for a single item
+ */
+export const getFullDataForItem = async (
+  id: string
+): Promise<DepartmentOfEnergyDataItem | never> => {
   const item = await db.getById(id).catch((e) => {
     throw e;
   });
