@@ -1,3 +1,7 @@
+import { InitialIndexDataItem } from "../types/types-general";
+import { DepartmentOfAgricultureIndexDataItem } from "./department-of-agriculture.service";
+import { getDataTypesByFileExtension } from "../utils/generalUtils";
+
 /**
  *
  * @param data an array of one of the highest level datatypes
@@ -27,4 +31,21 @@ export const checkForNulls = <T>(data: T) => {
   });
   const finalNullFields = Object.keys(nulls).filter((key) => nulls[key] === 1);
   return finalNullFields;
+};
+
+export const parseDataItemForIndexDataForUSGovData = (
+  item: DepartmentOfAgricultureIndexDataItem
+) => {
+  let newData = {} as InitialIndexDataItem;
+  newData.id = item.id;
+  newData.title = item.title ? item.title : "";
+  const dataTypesByFileExtension = getDataTypesByFileExtension(
+    item.distribution
+  );
+  dataTypesByFileExtension.length > 0 &&
+    (newData.dataTypesByFileExtension = dataTypesByFileExtension);
+  item.description && (newData.description = item.description);
+  item.spatial && (newData.spatialData = Boolean(item.spatial));
+  newData.apiData = false;
+  return newData;
 };

@@ -4,10 +4,10 @@ import {
   getFullDataForItem,
 } from "../services/department-of-agriculture.service";
 import validator from "validator";
-import { USGovernmentInitialDataItem } from "../types/types-general";
+import { InitialIndexData } from "../types/types-general";
 
 export const getInitialDepartmentOfAgricultureData =
-  async (): Promise<USGovernmentInitialDataItem> => {
+  async (): Promise<InitialIndexData> => {
     const data = await getInitialData().catch((e) => {
       throw e;
     });
@@ -28,22 +28,6 @@ export const getDepartmentOfAgricultureDataItem = async (
     return data;
   }
 };
-
-// export const checkTableForNulls = async (
-//   req: express.Request,
-//   res: express.Response
-// ) => {
-//   const data = (await getDepartmentOfAgricultureData().catch((e) => {
-//     throw e;
-//   })) as DepartmentOfAgricultureDataItem[];
-
-//   try {
-//     const nulls = checkForNulls(data);
-//     return nulls;
-//   } catch (e) {
-//     throw e;
-//   }
-// };
 
 // export const testPushDataToDb = async (
 //   req: express.Request,

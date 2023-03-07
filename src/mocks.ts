@@ -1,6 +1,6 @@
 import { DepartmentOfAgricultureDataItem } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
-import { USGovernmentInitialDataItem } from "./types/types-general";
+import { InitialIndexData } from "./types/types-general";
 
 export const mockDepartmentOfAgricultureDataItem: DepartmentOfAgricultureDataItem =
   {
@@ -35,28 +35,15 @@ export const mockDepartmentOfAgricultureDataItem: DepartmentOfAgricultureDataIte
     isPartOf: null,
   };
 
-export const mockUSGovernmentInitialDataItem: USGovernmentInitialDataItem = {
+export const mockUSGovernmentInitialDataItem: InitialIndexData = {
   data: [
     {
-      dataTypesByFileExtension: undefined,
       id: uuidv4(),
-      description: "description",
       title: "title",
-      spatial: null,
+      // dataTypesByFileExtension: [],
+      // description: "description",
     },
   ],
   originalJsonDataUrl: "https://www.invalidurl",
-  originalIntialUrl: undefined,
+  originalIntialUrl: "https://www.invalidurl",
 };
-
-//   export type USGovernmentInitialDataItem = {
-//     data: {
-//       dataTypesByFileExtension?: string[] | undefined;
-//       id: string;
-//       description: string | null;
-//       title: string | null;
-//       spatial: string | null;
-//   }[];
-//   originalJsonDataUrl: string;
-//   originalIntialUrl: string | undefined;
-// };

@@ -21,11 +21,15 @@ export const getFileExtension = (filename: string) => {
   );
 };
 
-export const getDataTypesByFileExtension = (distribution: Prisma.JsonArray) => {
+export const getDataTypesByFileExtension = (distribution: any) => {
+  if (typeof distribution !== "object" || !Array.isArray(distribution)) {
+    return [];
+  }
+
   let dataTypesByFileExtension: string[] = [];
   distribution.forEach((dist) => {
     if (typeof dist === "object" && !Array.isArray(dist)) {
-      const distributionObject = dist as Prisma.JsonObject;
+      const distributionObject = dist;
       let distUrl =
         distributionObject["downloadURL"] ||
         distributionObject["accessURL"] ||

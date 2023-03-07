@@ -5,7 +5,7 @@ export enum DataSources {
 
 type DatasourceMetadata = {
   originalJsonDataUrl: string;
-  originalInitialUrl?: string;
+  originalInitialUrl: string;
 };
 
 export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
@@ -22,14 +22,17 @@ export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
     },
   };
 
-export type USGovernmentInitialDataItem = {
-  data: {
-    dataTypesByFileExtension?: string[] | undefined;
-    id: string;
-    description: string | null;
-    title: string | null;
-    spatial: string | null;
-  }[];
+export type InitialIndexDataItem = {
+  id: string;
+  title: string;
+  dataTypesByFileExtension?: string[];
+  description?: string;
+  spatialData?: boolean;
+  apiData?: boolean;
+};
+
+export type InitialIndexData = {
+  data: InitialIndexDataItem[];
   originalJsonDataUrl: string;
-  originalIntialUrl: string | undefined;
+  originalIntialUrl: string;
 };

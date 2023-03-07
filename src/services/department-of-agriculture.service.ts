@@ -16,7 +16,14 @@ import {
 } from "@prisma/client";
 // import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
-import { DataSourceMetadataRecord, DataSources } from "../types/types-general";
+import {
+  DataSourceMetadataRecord,
+  DataSources,
+  InitialIndexData,
+  InitialIndexDataItem,
+} from "../types/types-general";
+import { PartialBy } from "../types/types-helpers";
+import { parseDataItemForIndexDataForUSGovData } from "./data-management.service";
 
 const prisma = new PrismaClient();
 
@@ -165,34 +172,24 @@ type InitialDataPayload = Prisma.DepartmentOfAgricultureDataItemGetPayload<{
   select: typeof initialDataSelect;
 }>;
 
-interface InitialData extends InitialDataPayload {
+export interface DepartmentOfAgricultureIndexDataItem
+  extends InitialDataPayload {
   dataTypesByFileExtension?: string[];
 }
 
-export const getInitialData = async () => {
+export const getInitialData = async (): Promise<InitialIndexData> => {
   const data = (await db.getAll(initialDataSelect).catch((e) => {
     throw e;
-  })) as InitialData[];
+  })) as DepartmentOfAgricultureIndexDataItem[];
+
+  let parsedData: InitialIndexDataItem[] = [];
 
   data.forEach((item) => {
-    if (
-      item.distribution &&
-      typeof item.distribution === "object" &&
-      Array.isArray(item.distribution)
-    ) {
-      item.dataTypesByFileExtension = getDataTypesByFileExtension(
-        item.distribution
-      );
-    } else {
-      item.dataTypesByFileExtension = [];
-    }
+    parsedData.push(parseDataItemForIndexDataForUSGovData(item));
   });
-  const dataReplyVal = data.map((item) => {
-    const { ["distribution"]: remove, ...rest } = item;
-    return rest;
-  });
+
   const returnVal = {
-    data: dataReplyVal,
+    data: parsedData,
     originalJsonDataUrl:
       DataSourceMetadataRecord[DataSources.DEPARTMENT_OF_AGRICULTURE]
         .originalJsonDataUrl,
@@ -211,11 +208,4 @@ export const getFullDataForItem = async (
     throw e;
   });
   return item;
-};
-
-export const getDepartmentOfAgricultureData = async () => {
-  const items = await db.getAll().catch((e) => {
-    throw e;
-  });
-  return items;
 };
