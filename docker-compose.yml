@@ -2,7 +2,7 @@ version: "3"
 services:
   node:
     container_name: public_data_browser_node
-    image: node:18
+    image: node:18-alpine
     user: "node"
     restart: always
     working_dir: /home/node/app
@@ -13,13 +13,14 @@ services:
     ports:
       - 3001:3001
       - 9229:9229
-    command: bash -c "npm install && npm run dev:debug"
-  proxy:
-    container_name: public_data_browser_proxy
-    image: testcab/cors-anywhere
-    restart: always
-    ports:
-      - 8080:8080
+    # command: bash -c "npm install && npm run dev:debug"
+    command: sh -c "npm install && npm run dev:debug"
+  # proxy:
+  #   container_name: public_data_browser_proxy
+  #   image: testcab/cors-anywhere
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
   db:
     container_name: public_data_browser_db
     image: mysql:8.0
