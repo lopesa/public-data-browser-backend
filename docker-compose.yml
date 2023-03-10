@@ -2,19 +2,22 @@ version: "3"
 services:
   node:
     container_name: public_data_browser_node
-    image: node:18-alpine
+    # image: node:18-alpine
+    build:
+      context: .
+      no_cache: true
     user: "node"
     restart: always
-    working_dir: /home/node/app
-    environment:
-      - NODE_ENV=development
+    # working_dir: /home/node/app
+    # environment:
+    #   - NODE_ENV=development
     volumes:
       - ./:/home/node/app
     ports:
       - 3001:3001
       - 9229:9229
     # command: bash -c "npm install && npm run dev:debug"
-    command: sh -c "npm install && npm run dev:debug"
+    # command: sh -c "npm install && npm run dev:debug"
   # proxy:
   #   container_name: public_data_browser_proxy
   #   image: testcab/cors-anywhere

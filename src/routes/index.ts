@@ -1,6 +1,7 @@
 import express from "express";
 var router = express.Router();
 import { getSpreadsheetData } from "../controllers/all-data-sources.controller";
+import AuthRoutes from "./user.router";
 // import { testPrisma } from "../services/db.service";
 
 router.get("/", async (req: express.Request, res: express.Response) => {
