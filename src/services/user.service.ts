@@ -19,7 +19,6 @@ const UserService = {
         await dbCatchMethod(e);
         throw e;
       });
-    debugger;
     await prisma.$disconnect();
     return created;
   },
