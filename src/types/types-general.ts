@@ -1,3 +1,11 @@
+import { Prisma } from "@prisma/client";
+import { getFullDataForItem as departmentOfAgricultureGetFullDataForItem } from "../services/department-of-agriculture.service";
+import { getFullDataForItem as departmentOfEnergyGetFullDataForItem } from "../services/department-of-energy.service";
+import {
+  DepartmentOfAgricultureDataItem,
+  DepartmentOfEnergyDataItem,
+} from "@prisma/client";
+
 export enum DataSources {
   DEPARTMENT_OF_AGRICULTURE,
   DEPARTMENT_OF_ENERGY,
@@ -36,3 +44,21 @@ export type InitialIndexData = {
   originalJsonDataUrl: string;
   originalIntialUrl: string;
 };
+
+export type BookmarkKey = {
+  dataItemUuid: string;
+  datasetId: DatasetKeys;
+};
+
+export const enum DatasetKeys {
+  departmentOfAgriculture = "departmentOfAgriculture",
+  departmentOfEnergy = "departmentOfEnergy",
+}
+
+export type DatasetGetFullDataMethod =
+  | typeof departmentOfAgricultureGetFullDataForItem
+  | typeof departmentOfEnergyGetFullDataForItem;
+
+export type AllDataTypes =
+  | DepartmentOfAgricultureDataItem
+  | DepartmentOfEnergyDataItem;

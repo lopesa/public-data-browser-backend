@@ -4,16 +4,23 @@ var router = express.Router();
 import passport from "passport";
 import { generateJWT } from "../services/auth.service";
 
-router.post(
-  "/signup",
-  passport.authenticate("signup", { session: false, failWithError: true }),
-  async (req, res, next) => {
-    res.json({
-      message: "Signup successful",
-      user: req.user,
-    });
-  }
-);
+router.post("/signup", async (req, res, next) => {
+  passport.authenticate(
+    "signup",
+    { session: false, failWithError: true },
+
+    async (err: Error, user: User, info?: { message: string }) => {
+      if (err || !user) {
+        return next(err || new Error("Problem Authenticating"));
+      }
+      const body = { _id: user.id, email: user.email };
+      const token = generateJWT(body);
+      return token
+        ? res.json({ token, email: user.email })
+        : next(new Error("Account created, but Problem creating token"));
+    }
+  )(req, res, next);
+});
 
 router.post("/login", async (req, res, next) => {
   passport.authenticate(
@@ -29,7 +36,7 @@ router.post("/login", async (req, res, next) => {
         const token = generateJWT(body);
 
         return token
-          ? res.json({ token })
+          ? res.json({ token, email: user.email })
           : next(new Error("Problem creating token"));
       });
     }

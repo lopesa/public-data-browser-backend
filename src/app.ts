@@ -9,6 +9,7 @@ import indexRouter from "./routes/index";
 import departmentOfAgricultureRouter from "./routes/department-of-agriculture.router";
 import departmentOfEnergyRouter from "./routes/department-of-energy.router";
 import userRouter from "./routes/user.router";
+import bookmarksRouter from "./routes/bookmarks.router";
 
 require("./services/auth.service");
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/user", userRouter);
+app.use("/bookmarks", bookmarksRouter);
 app.use("/department-of-agriculture", departmentOfAgricultureRouter);
 app.use("/department-of-energy", departmentOfEnergyRouter);
 

@@ -1,7 +1,9 @@
 /**
  * followed: https://www.digitalocean.com/community/tutorials/api-authentication-with-json-web-tokensjwt-and-passport
  *
- * this is also a good darticle: https://medium.com/@prashantramnyc/difference-between-session-cookies-vs-jwt-json-web-tokens-for-session-management-4be67d2f066e
+ * this is also a good article: https://medium.com/@prashantramnyc/difference-between-session-cookies-vs-jwt-json-web-tokens-for-session-management-4be67d2f066e
+ *
+ * https://stackoverflow.com/questions/32722952/is-it-safe-to-put-a-jwt-into-the-url-as-a-query-parameter-of-a-get-request#:~:text=on%20this%20post.-,Is%20it%20safe%20to%20put%20a%20jwt%20(json%20web%20token,is%20URL%2Dencoding%2Dsafe.
  */
 
 import passport from "passport";
@@ -21,12 +23,18 @@ passport.use(
       passwordField: "password",
     },
     async (email, password, done) => {
+      const userExists = await UserService.getUser(email).catch((e) => {
+        done(new Error("problem checking user exists"), false);
+      });
+      if (userExists) {
+        return done(new Error("User already exists"), false);
+      }
       const user = await UserService.create({ email, password }).catch((e) => {
         done(e);
       });
-      user
+      return user
         ? done(null, user)
-        : done(null, false, { message: "Something went wrong" });
+        : done(new Error("Problem Creating User"), false);
     }
   )
 );
@@ -60,7 +68,8 @@ passport.use(
     {
       secretOrKey: process.env.JWT_TOKEN_SECRET,
       jwtFromRequest:
-        PassportJWT.ExtractJwt.fromUrlQueryParameter("secret_token"),
+        // PassportJWT.ExtractJwt.fromUrlQueryParameter("secret_token"),
+        PassportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
     },
     async (token, done) => {
       try {
