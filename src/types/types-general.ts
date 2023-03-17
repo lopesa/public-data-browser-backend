@@ -50,6 +50,11 @@ export type BookmarkKey = {
   datasetId: DatasetKeys;
 };
 
+export type BookmarkInputCandidate = {
+  originalSource: string;
+  originalId: string;
+};
+
 export const enum DatasetKeys {
   departmentOfAgriculture = "departmentOfAgriculture",
   departmentOfEnergy = "departmentOfEnergy",
@@ -59,6 +64,9 @@ export type DatasetGetFullDataMethod =
   | typeof departmentOfAgricultureGetFullDataForItem
   | typeof departmentOfEnergyGetFullDataForItem;
 
-export type AllDataTypes =
+export type AllDataTypesIntersection = DepartmentOfAgricultureDataItem &
+  DepartmentOfEnergyDataItem;
+
+export type AllDataTypesUnion =
   | DepartmentOfAgricultureDataItem
   | DepartmentOfEnergyDataItem;
