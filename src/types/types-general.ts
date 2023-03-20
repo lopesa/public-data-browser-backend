@@ -70,3 +70,8 @@ export type AllDataTypesIntersection = DepartmentOfAgricultureDataItem &
 export type AllDataTypesUnion =
   | DepartmentOfAgricultureDataItem
   | DepartmentOfEnergyDataItem;
+
+export type JwtTokenUser = {
+  _id: string;
+  email: string;
+};

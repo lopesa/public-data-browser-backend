@@ -9,16 +9,6 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
-model User {
-  id          String   @id @default(uuid())
-  email       String   @unique
-  password    String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
-}
-
 model DataSource {
   id          String   @id @default(uuid())
   name        String   @unique
@@ -99,3 +89,72 @@ model DepartmentOfEnergyDataItem {
   isPartOf String?
   @@index(fields: [title], map: "title_index")
 }
+
+model BookmarkItem {
+  id          String   @id @default(uuid())
+  originalSource String
+  originalId String @unique
+  type String?
+  identifier  String?   @unique
+  accessLevel String?
+  contactPoint Json?
+  programCode Json?
+  description String? @db.LongText
+  title       String? @db.VarChar(500)
+  distribution Json?
+  license     String?
+  bureauCode  Json?
+  modified    Json?
+  publisher   Json?
+  accrualPeriodicity String?
+  keyword     Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  describedBy Json?
+  issued Json?
+  language Json?
+  rights String?  @db.VarChar(500)
+  spatial String? @db.LongText
+  conformsTo Json?
+  temporal String?
+  dataQuality Boolean?
+  describedByType String?
+  landingPage String? @db.VarChar(500)
+  references Json?
+  theme Json?
+  systemOfRecords String?
+  isPartOf String?
+  @@index(fields: [title], map: "title_index")
+}
+
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
+  bookmarks Json?
+}
+
+// model BookmarksToBookmarkers {
+//   bookmarkItem BookmarkItem @relation(fields: [bookmarkItemId], references: [id])
+//   bookmarkItemId String
+//   bookmarker User @relation(fields: [bookmarkerId], references: [id])
+//   bookmarkerId String
+//   createdAt   DateTime @default(now())
+//   @@id([bookmarkItemId, bookmarkerId])
+// }
+
+// model CategoriesOnPosts {
+//   post       Post     @relation(fields: [postId], references: [id])
+//   postId     Int // relation scalar field (used in the `@relation` attribute above)
+//   category   Category @relation(fields: [categoryId], references: [id])
+//   categoryId Int // relation scalar field (used in the `@relation` attribute above)
+//   assignedAt DateTime @default(now())
+//   assignedBy String
+
+//   @@id([postId, categoryId])
+// }

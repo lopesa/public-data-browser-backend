@@ -8,9 +8,10 @@
 
 import passport from "passport";
 import Strategy from "passport-local";
-import UserService from "./user.service";
+import { getUserByEmail, createUser, isValidPassword } from "./user.service";
 import PassportJWT from "passport-jwt";
 import jwt from "jsonwebtoken";
+import { JwtTokenUser } from "../types/types-general";
 
 const localStrategy = Strategy.Strategy;
 const JWT_VALID_TIME = "1d";
@@ -23,13 +24,13 @@ passport.use(
       passwordField: "password",
     },
     async (email, password, done) => {
-      const userExists = await UserService.getUser(email).catch((e) => {
+      const userExists = await getUserByEmail(email).catch((e) => {
         done(new Error("problem checking user exists"), false);
       });
       if (userExists) {
         return done(new Error("User already exists"), false);
       }
-      const user = await UserService.create({ email, password }).catch((e) => {
+      const user = await createUser(email, password).catch((e) => {
         done(e);
       });
       return user
@@ -47,13 +48,13 @@ passport.use(
       passwordField: "password",
     },
     async (email, password, done) => {
-      const user = await UserService.getUser(email).catch((e) => {
+      const user = await getUserByEmail(email).catch((e) => {
         return done(e || new Error("Problem finding user"));
       });
       if (!user) {
         return done(null, false, { message: "User not found" });
       }
-      const validate = await UserService.isValidPassword(user, password);
+      const validate = await isValidPassword(user, password);
       if (!validate) {
         return done(new Error("Wrong Password"), false);
       }
@@ -73,7 +74,7 @@ passport.use(
     },
     async (token, done) => {
       try {
-        return done(null, token.user);
+        return done(null, token.user as JwtTokenUser);
       } catch (error) {
         done(error);
       }
