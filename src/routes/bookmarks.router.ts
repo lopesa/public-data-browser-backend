@@ -37,38 +37,15 @@ router.post("/addBookmarks", async (req, res, next) => {
       if (!bookmarks) {
         return next(new Error("No bookmarks provided"));
       }
-      const updatedUser = await addBookmarksForUser(user, bookmarks).catch(
+      const userBookmarks = await addBookmarksForUser(user, bookmarks).catch(
         (e) => {
           next(e);
         }
       );
-
-      // factor this out of the router
-      if (
-        !updatedUser?.bookmarks ||
-        !(typeof updatedUser.bookmarks === "object") ||
-        !Array.isArray(updatedUser.bookmarks) ||
-        !updatedUser.bookmarks.length
-      ) {
-        return next(new Error("Problem updating user"));
+      if (!userBookmarks) {
+        return next(new Error("Problem adding bookmarks"));
       }
-
-      // this is suspect, is it definitely an array of strings?
-      const filteredBookmarks = Array.from(updatedUser.bookmarks).filter(
-        (bookmark) => {
-          return bookmark !== null;
-        }
-      ) as string[];
-
-      const initialBookmarkData = await getInitialDataForBookmarks(
-        filteredBookmarks
-      ).catch((e) => {
-        return next(new Error("Bookmark added but failed to get return data"));
-      });
-
-      debugger;
-
-      res.status(200).json(initialBookmarkData);
+      res.status(200).json(userBookmarks);
     }
   )(req, res, next);
 });

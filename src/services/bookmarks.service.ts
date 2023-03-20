@@ -1,4 +1,4 @@
-import { PrismaClient, Prisma, User, BookmarkItem } from "@prisma/client";
+import { PrismaClient, Prisma, BookmarkItem } from "@prisma/client";
 import { dbCatchMethod } from "../services/db.service";
 import {
   AllDataTypesUnion,
@@ -9,7 +9,6 @@ import {
 } from "../types/types-general";
 import { getFullDataForItem as departmentOfAgricultureGetFullDataForItem } from "../services/department-of-agriculture.service";
 import { getFullDataForItem as departmentOfEnergyGetFullDataForItem } from "../services/department-of-energy.service";
-import { getUserById, updateUser, updateUserById } from "./user.service";
 
 const prisma = new PrismaClient();
 
@@ -22,10 +21,10 @@ export const DatasetKeyToDatasetGetMethod: Record<
 };
 
 const db = {
-  createMany: async (bookmarks: Prisma.BookmarkItemCreateManyInput[]) => {
+  createMany: async (data: Prisma.BookmarkItemCreateManyInput[]) => {
     const created = await prisma.bookmarkItem
       .createMany({
-        data: bookmarks,
+        data,
       })
       .catch(async (e) => {
         await dbCatchMethod(e);
@@ -34,15 +33,21 @@ const db = {
     await prisma.$disconnect();
     return created;
   },
-  create: async (data: Prisma.BookmarkItemCreateInput) => {
-    const created = await prisma.bookmarkItem
-      .create({
-        data,
-      })
-      .catch(async (e) => {
-        await dbCatchMethod(e);
-        throw e;
-      });
+  create: async (
+    data: Prisma.BookmarkItemCreateInput,
+    select?: Prisma.BookmarkItemSelect
+  ) => {
+    const args: {
+      data: Prisma.BookmarkItemCreateInput;
+      select?: Prisma.BookmarkItemSelect;
+    } = {
+      data: data,
+    };
+    select && (args.select = select);
+    const created = await prisma.bookmarkItem.create(args).catch(async (e) => {
+      await dbCatchMethod(e);
+      throw e;
+    });
     await prisma.$disconnect();
     return created;
   },
@@ -63,6 +68,27 @@ const db = {
     });
     await prisma.$disconnect();
     return item;
+  },
+  getBookmarks: async (
+    where: Prisma.BookmarkItemWhereInput,
+    select?: Prisma.BookmarkItemSelect,
+    include?: Prisma.BookmarkItemInclude
+  ) => {
+    const args: {
+      where: Prisma.BookmarkItemWhereInput;
+      select?: Prisma.BookmarkItemSelect;
+      include?: Prisma.BookmarkItemInclude;
+    } = {
+      where: where,
+    };
+    select && (args.select = select);
+    include && (args.include = include);
+    const items = await prisma.bookmarkItem.findMany(args).catch(async (e) => {
+      await dbCatchMethod(e);
+      throw e;
+    });
+    await prisma.$disconnect();
+    return items;
   },
 };
 
@@ -110,6 +136,29 @@ export const getInitialDataForBookmarks = async (bookmarkIds: string[]) => {
       return result;
     })
   );
+};
+
+export const getInitialUserBookmarkDataByUserId = async (id: string) => {
+  return await db
+    .getBookmarks(
+      {
+        users: {
+          some: {
+            id,
+          },
+        },
+      },
+      {
+        id: true,
+        title: true,
+        description: true,
+        distribution: true,
+        spatial: true,
+      }
+    )
+    .catch((e) => {
+      throw e;
+    });
 };
 
 export const getFullDataForBookmarks = async (bookmarks: BookmarkKey[]) => {
@@ -171,7 +220,7 @@ const prepBookmarkDataForDb = (
 export const addBookmarksToDb = async (
   bookmarks: Prisma.BookmarkItemCreateManyInput[]
 ) => {
-  const result = await Promise.all(
+  return await Promise.all(
     bookmarks.map(async (bookmark) => {
       const created = await db.create(bookmark).catch((err) => {
         throw err;
@@ -179,43 +228,35 @@ export const addBookmarksToDb = async (
       return created;
     })
   );
-  // debugger;
-  const bookmarkIds = result.map((resultItem) => resultItem.id);
-  // debugger;
-  return bookmarkIds;
-
-  // return db.createMany(bookmarks);
 };
 
-export const concatBookmarksToUser = async (
-  bookmarksIds: string[],
+export const addBookmarksToDbWithUser = async (
+  fullData: Prisma.BookmarkItemCreateInput[],
   user: JwtTokenUser
 ) => {
-  debugger;
-  const fullUserData = await getUserById(user._id).catch((e) => {
-    throw e;
+  fullData = fullData.map((data) => {
+    return {
+      ...data,
+      users: {
+        connect: [{ id: user._id }],
+      },
+    };
   });
-  if (!fullUserData) {
-    throw new Error("Failed to get user data");
-  }
-  let currentBookmarks = fullUserData?.bookmarks;
-  if (
-    !currentBookmarks ||
-    !Array.isArray(currentBookmarks) ||
-    !currentBookmarks.length
-  ) {
-    currentBookmarks = [];
-  }
-  // const newBookmarks = [...currentBookmarks, ...bookmarksIds];
-  const newBookmarks = [...currentBookmarks, ...bookmarksIds];
-  const updatedUser = await updateUser(fullUserData, {
-    bookmarks: newBookmarks,
-  }).catch((e) => {
-    throw e;
-  });
-  debugger;
-  if (!updatedUser) {
-    throw new Error("Failed to update user bookmarks");
-  }
-  return updatedUser;
+
+  // I have to execute this as a batch of create vs createMany because
+  // createMany can't handle the connect
+  // https://www.prisma.io/docs/concepts/components/prisma-client/relation-queries#create-multiple-records-and-multiple-related-records
+  // const addedBookmarks = await db.createMany(fullData).catch((e) => {
+  //   throw e;
+  // });
+
+  const addedBookmarks = await Promise.all(
+    fullData.map(async (data) => {
+      return await db.create(data).catch((e) => {
+        throw e;
+      });
+    })
+  );
+
+  return addedBookmarks;
 };

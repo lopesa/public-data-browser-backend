@@ -1,57 +1,39 @@
-import { PrismaClient, Prisma, User } from "@prisma/client";
 import { BookmarkKey, JwtTokenUser } from "../types/types-general";
 import {
-  addBookmarksToDb,
-  concatBookmarksToUser,
-  getExistingBookmarks,
+  addBookmarksToDbWithUser,
   getFullDataForBookmarks,
+  getInitialUserBookmarkDataByUserId,
 } from "../services/bookmarks.service";
 
 export const addBookmarksForUser = async (
   user: JwtTokenUser,
   bookmarks: BookmarkKey[]
 ) => {
-  const existingBookmarks = await getExistingBookmarks(bookmarks).catch((e) => {
-    return [];
+  const fullData = await getFullDataForBookmarks(bookmarks).catch((e) => {
+    throw e;
   });
-  const existingBookmarksOriginalIds = existingBookmarks.map((bookmark) => {
-    return bookmark.originalId;
-  });
-  const bookmarksToAddToDb = bookmarks.filter((bookmark) => {
-    return !existingBookmarksOriginalIds.includes(bookmark.dataItemUuid);
-  });
-
-  let bookmarkIdsAddedToDb: string[] = [];
-  if (bookmarksToAddToDb.length > 0) {
-    const fullData = await getFullDataForBookmarks(bookmarksToAddToDb).catch(
-      (e) => {
-        throw e;
-      }
-    );
-    if (!fullData.length) {
-      throw new Error("Could not get full data for bookmarks");
-    }
-
-    // check if bookmarks exist.
-    bookmarkIdsAddedToDb = await addBookmarksToDb(fullData).catch((e) => {
-      throw e;
-    });
+  if (!fullData.length) {
+    throw new Error("Could not get full data for bookmarks");
   }
 
-  const bookmarkIdsToAddToUser = bookmarkIdsAddedToDb.concat(
-    existingBookmarks.map((bookmark) => {
-      return bookmark.id;
-    })
+  const addedBookmarks = await addBookmarksToDbWithUser(fullData, user).catch(
+    (e) => {
+      throw e;
+    }
   );
 
-  const updatedUser = await concatBookmarksToUser(
-    bookmarkIdsToAddToUser,
-    user
+  if (!addedBookmarks) {
+    throw new Error("Could not add bookmarks to db");
+  }
+
+  const userBookmarksInitialData = await getInitialUserBookmarkDataByUserId(
+    user._id
   ).catch((e) => {
     throw e;
   });
-  if (!updatedUser) {
-    throw new Error("Could not update user");
+
+  if (!userBookmarksInitialData) {
+    throw new Error("Could not get user bookmarks initial data");
   }
-  return updatedUser;
+  return userBookmarksInitialData;
 };

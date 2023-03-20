@@ -125,6 +125,7 @@ model BookmarkItem {
   theme Json?
   systemOfRecords String?
   isPartOf String?
+  users User[]
   @@index(fields: [title], map: "title_index")
 }
 
@@ -136,25 +137,5 @@ model User {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
-  bookmarks Json?
+  bookmarks BookmarkItem[]
 }
-
-// model BookmarksToBookmarkers {
-//   bookmarkItem BookmarkItem @relation(fields: [bookmarkItemId], references: [id])
-//   bookmarkItemId String
-//   bookmarker User @relation(fields: [bookmarkerId], references: [id])
-//   bookmarkerId String
-//   createdAt   DateTime @default(now())
-//   @@id([bookmarkItemId, bookmarkerId])
-// }
-
-// model CategoriesOnPosts {
-//   post       Post     @relation(fields: [postId], references: [id])
-//   postId     Int // relation scalar field (used in the `@relation` attribute above)
-//   category   Category @relation(fields: [categoryId], references: [id])
-//   categoryId Int // relation scalar field (used in the `@relation` attribute above)
-//   assignedAt DateTime @default(now())
-//   assignedBy String
-
-//   @@id([postId, categoryId])
-// }
