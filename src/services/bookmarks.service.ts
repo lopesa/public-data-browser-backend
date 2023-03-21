@@ -10,6 +10,10 @@ import {
 import { getFullDataForItem as departmentOfAgricultureGetFullDataForItem } from "../services/department-of-agriculture.service";
 import { getFullDataForItem as departmentOfEnergyGetFullDataForItem } from "../services/department-of-energy.service";
 
+type BookmarkItemWithUsers = Prisma.BookmarkItemGetPayload<{
+  include: { users: true };
+}>;
+
 const prisma = new PrismaClient();
 
 export const DatasetKeyToDatasetGetMethod: Record<
@@ -54,14 +58,18 @@ const db = {
   getBookmark: async (
     where: Prisma.BookmarkItemWhereUniqueInput,
     select?: Prisma.BookmarkItemSelect
+    // include?: Prisma.BookmarkItemInclude
+    // ): Promise<BookmarkItem | BookmarkItemWithUsers | null> => {
   ) => {
     const args: {
       where: Prisma.BookmarkItemWhereUniqueInput;
       select?: Prisma.BookmarkItemSelect;
+      // include?: Prisma.BookmarkItemInclude;
     } = {
       where: where,
     };
     select && (args.select = select);
+    // include && (args.include = include);
     const item = await prisma.bookmarkItem.findUnique(args).catch(async (e) => {
       await dbCatchMethod(e);
       throw e;
@@ -89,6 +97,22 @@ const db = {
     });
     await prisma.$disconnect();
     return items;
+  },
+  updateBookmark: async (
+    where: Prisma.BookmarkItemWhereUniqueInput,
+    data: Prisma.BookmarkItemUpdateInput
+  ) => {
+    const updated = await prisma.bookmarkItem
+      .update({
+        where: where,
+        data: data,
+      })
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return updated;
   },
 };
 
@@ -150,6 +174,7 @@ export const getInitialUserBookmarkDataByUserId = async (id: string) => {
       },
       {
         id: true,
+        originalId: true,
         title: true,
         description: true,
         distribution: true,
@@ -259,4 +284,106 @@ export const addBookmarksToDbWithUser = async (
   );
 
   return addedBookmarks;
+};
+
+const isBookmarkDataWithUser = (
+  bookmarkData: BookmarkItem | BookmarkItemWithUsers
+): bookmarkData is BookmarkItemWithUsers => {
+  return (bookmarkData as BookmarkItemWithUsers).users !== undefined;
+};
+
+// const userWithPosts = Prisma.validator<Prisma.UserArgs>()({
+//   include: { posts: true },
+// })
+
+// // 2: Define a type that only contains a subset of the scalar fields
+// const userPersonalData = Prisma.validator<Prisma.UserArgs>()({
+//   select: { email: true, name: true },
+// })
+
+// // 3: This type will include a user and all their posts
+// type UserWithPosts = Prisma.UserGetPayload<typeof userWithPosts>
+
+const bookmarkWithUserCount = Prisma.validator<Prisma.BookmarkItemArgs>()({
+  select: {
+    _count: {
+      select: {
+        users: true,
+      },
+    },
+  },
+});
+
+type BookmarkWithUserCount = Prisma.BookmarkItemGetPayload<
+  typeof bookmarkWithUserCount
+> | null;
+
+export const removeBookmarkFromDbForUser = async (
+  user: JwtTokenUser,
+  bookmarkOriginalId: string
+) => {
+  // const userCountBefore = (await db
+  //   .getBookmark(
+  //     { originalId: bookmarkOriginalId },
+  //     {
+  //       _count: {
+  //         select: { users: true },
+  //       },
+  //     }
+  //   )
+  //   .catch((e) => {
+  //     throw e;
+  //   })) as BookmarkWithUserCount;
+
+  // const test = userCountBefore?._count?.users;
+
+  // debugger;
+
+  const updatedBookmark = await db
+    .updateBookmark(
+      { originalId: bookmarkOriginalId },
+      {
+        users: {
+          disconnect: [{ id: user._id }],
+        },
+      }
+    )
+    .catch((e) => {
+      throw e;
+    });
+  debugger;
+
+  if (!updatedBookmark) {
+    throw new Error("Problem removing bookmark from user");
+  }
+
+  const userCountCall = (await db
+    .getBookmark(
+      { originalId: bookmarkOriginalId },
+      {
+        _count: {
+          select: { users: true },
+        },
+      }
+    )
+    .catch((e) => {
+      throw e;
+    })) as BookmarkWithUserCount;
+
+  const userCount = userCountCall?._count?.users;
+
+  debugger;
+
+  if (userCount === 0) {
+    // delete the bookmark
+  }
+
+  // if (!isBookmarkDataWithUser(result)) {
+  //   throw new Error("Problem getting existing bookmark data");
+  // }
+
+  // const numBookmarkers = result?.users.length;
+  // const numBookmarkers = allBookmarkers.length;
+  // debugger;
+  return true;
 };
