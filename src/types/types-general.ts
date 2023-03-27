@@ -5,13 +5,16 @@ import {
   DepartmentOfAgricultureDataItem,
   DepartmentOfEnergyDataItem,
 } from "@prisma/client";
+import icoDataJson from "../data/international-coffee-organization.json";
 
 export enum DataSources {
   DEPARTMENT_OF_AGRICULTURE,
   DEPARTMENT_OF_ENERGY,
+  INTERNATIONAL_COFFEE_ORGANIZATION,
 }
 
 type DatasourceMetadata = {
+  originalJsonData?: Array<object>;
   originalJsonDataUrl: string;
   originalInitialUrl: string;
 };
@@ -27,6 +30,11 @@ export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
       originalJsonDataUrl:
         "https://www.energy.gov/sites/default/files/2023-01/pdl010123.json",
       originalInitialUrl: "https://data.gov/metrics.html",
+    },
+    [DataSources.INTERNATIONAL_COFFEE_ORGANIZATION]: {
+      originalJsonData: icoDataJson,
+      originalJsonDataUrl: "https://www.ico.org/new_historical.asp",
+      originalInitialUrl: "https://www.ico.org/new_historical.asp",
     },
   };
 

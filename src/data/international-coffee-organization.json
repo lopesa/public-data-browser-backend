@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Supply Data",
+    "distribution": [
+      {
+        "title": "Total production - Crop Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/1a%20-%20Total%20production.xlsx"
+      },
+      {
+        "title": "Domestic consumption - Crop Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/1b%20-%20Domestic%20consumption.xlsx"
+      },
+      {
+        "title": "Gross opening stocks - Crop Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/1d%20-%20Gross%20Opening%20stocks.xlsx"
+      },
+      {
+        "title": "Exports - Crop Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/1e%20-%20Exports%20-%20crop%20year.xlsx"
+      }
+    ]
+  },
+  {
+    "title": "Trade Statistics Data",
+    "distribution": [
+      {
+        "title": "Exports - Calendar Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/2a%20-%20Exports%20-%20calendar%20year.xlsx"
+      },
+      {
+        "title": "Imports - Calendar Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/2b%20-%20Imports.xlsx"
+      },
+      {
+        "title": "Re-exports - Calendar Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/2c%20-%20Re-exports.xlsx"
+      }
+    ]
+  },
+  {
+    "title": "Price Data (US cents per lb)",
+    "distribution": [
+      {
+        "title": "Prices to Growers - Annual Averages",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/3a%20-%20Prices%20paid%20to%20growers.xlsx"
+      },
+      {
+        "title": "Retail Prices - Annual Averages",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/3b%20-%20Retail%20prices.xlsx"
+      },
+      {
+        "title": "ICO Composite & Group Indicator Prices - Monthly Averages",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/3c%20-%20Indicator%20prices.xlsx"
+      }
+    ]
+  },
+  {
+    "title": "Inventories/Consumption Data",
+    "distribution": [
+      {
+        "title": "Inventories - End of Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/4a%20-%20Inventories.xlsx"
+      },
+      {
+        "title": "Disappearance (consumption) - End of Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/4b%20-%20Disappearance.xlsx"
+      }
+    ]
+  },
+  {
+    "title": "Non-Member Data",
+    "distribution": [
+      {
+        "title": "Imports - Calendar Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/5a%20-%20Non-member%20imports.xlsx"
+      },
+      {
+        "title": "Re-exports - Calendar Year",
+        "downloadURL": "https://www.ico.org/historical/1990%20onwards/Excel/5b%20-%20Non-member%20re-exports.xlsx"
+      }
+    ]
+  }
+]

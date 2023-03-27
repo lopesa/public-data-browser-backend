@@ -21,6 +21,15 @@ model DataSource {
   modelName   String  @unique
 }
 
+model InternationalCoffeeOrganizationDataItem {
+  id          String   @id @default(uuid())
+  description String? @db.LongText
+  title       String? @db.VarChar(500)
+  createdAt   DateTime @default(now())
+  distribution Json?
+  @@index(fields: [title], map: "title_index")
+}
+
 model DepartmentOfAgricultureDataItem {
   id          String   @id @default(uuid())
   identifier  String?   @unique

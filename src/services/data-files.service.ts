@@ -6,6 +6,7 @@ import { DataSources } from "../types/types-general";
 enum DataFileBaseNames {
   DEPARTMENT_OF_AGRICULTURE_BASE_DATA_ = "DEPARTMENT_OF_AGRICULTURE_BASE_DATA_",
   DEPARTMENT_OF_ENERGY_BASE_DATA_ = "DEPARTMENT_OF_ENERGY_BASE_DATA_",
+  INTERNATIONAL_COFFEE_ORGANIZATION_BASE_DATA_ = "INTERNATIONAL_COFFEE_ORGANIZATION_BASE_DATA_",
 }
 
 const dataFileBaseNamesRecord: Record<DataSources, DataFileBaseNames> = {
@@ -13,6 +14,8 @@ const dataFileBaseNamesRecord: Record<DataSources, DataFileBaseNames> = {
     DataFileBaseNames.DEPARTMENT_OF_AGRICULTURE_BASE_DATA_,
   [DataSources.DEPARTMENT_OF_ENERGY]:
     DataFileBaseNames.DEPARTMENT_OF_ENERGY_BASE_DATA_,
+  [DataSources.INTERNATIONAL_COFFEE_ORGANIZATION]:
+    DataFileBaseNames.INTERNATIONAL_COFFEE_ORGANIZATION_BASE_DATA_,
 };
 
 export const getCurrentDataFile = async (dataSource: DataSources) => {

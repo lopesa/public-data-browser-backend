@@ -1,4 +1,5 @@
 import { Prisma } from "@prisma/client";
+import fs from "fs";
 
 export const diff_hours = (dt2: number, dt1: number) => {
   var diff = (dt2 - dt1) / 1000;

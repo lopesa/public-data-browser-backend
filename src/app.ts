@@ -10,6 +10,7 @@ import departmentOfAgricultureRouter from "./routes/department-of-agriculture.ro
 import departmentOfEnergyRouter from "./routes/department-of-energy.router";
 import userRouter from "./routes/user.router";
 import bookmarksRouter from "./routes/bookmarks.router";
+import internationalCoffeeOrganizationRouter from "./routes/international-coffee-organization.router";
 
 require("./services/auth.service");
 
@@ -29,6 +30,10 @@ app.use("/user", userRouter);
 app.use("/bookmarks", bookmarksRouter);
 app.use("/department-of-agriculture", departmentOfAgricultureRouter);
 app.use("/department-of-energy", departmentOfEnergyRouter);
+app.use(
+  "/international-coffee-organization",
+  internationalCoffeeOrganizationRouter
+);
 
 app.use(
   (
