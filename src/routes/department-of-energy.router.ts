@@ -1,4 +1,5 @@
 import express from "express";
+import { Stats } from "fs";
 var router = express.Router();
 
 import {
@@ -7,6 +8,7 @@ import {
   // checkTableForNulls,
   getInitialDepartmentOfEnergyData,
   getDepartmentOfEnergyDataItem,
+  addOrReplaceDbData,
 } from "../controllers/department-of-energy.controller";
 
 router.get(
@@ -36,6 +38,24 @@ router.get(
       next(e || new Error("Error fetching data"));
     });
     data ? res.status(200).json(data) : next();
+  }
+);
+
+router.post(
+  "/add-data-to-db",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const staleTime = req.body.staleTime && Number(req.body.staleTime);
+    debugger;
+    const result = await addOrReplaceDbData(
+      typeof staleTime === "number" ? staleTime : undefined
+    ).catch((e) => {
+      next(e || new Error("Error adding data to db"));
+    });
+    result ? res.status(200).json(result) : next();
   }
 );
 

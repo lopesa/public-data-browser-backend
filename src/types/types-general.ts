@@ -19,6 +19,11 @@ type DatasourceMetadata = {
   originalInitialUrl: string;
 };
 
+export type DataSourceModelNames =
+  | "DepartmentOfAgricultureDataItem"
+  | "DepartmentOfEnergyDataItem"
+  | "InternationalCoffeeOrganizationDataItem";
+
 export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
   {
     [DataSources.DEPARTMENT_OF_AGRICULTURE]: {

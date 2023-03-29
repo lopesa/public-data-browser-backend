@@ -1,8 +1,9 @@
 import express from "express";
 import { DataSources } from "../types/types-general";
-import { fetchNewData } from "../services/data-fetch.service";
 import {
   addSourceDataToDbService,
+  emptyTable,
+  getCount,
   getDepartmentOfEnergyData,
   getFullDataForItem,
   getInitialData,
@@ -10,6 +11,15 @@ import {
 import { DepartmentOfEnergyDataItem } from "@prisma/client";
 import validator from "validator";
 import { checkForNulls } from "../services/data-management.service";
+import {
+  getDataSourceByModelName,
+  updateDataSourceInfo,
+} from "../services/data-source.service";
+import { diff_hours } from "../utils/generalUtils";
+import {
+  AddOrReplaceDbDataParams,
+  addOrReplaceDbData as addOrReplaceDbDataService,
+} from "../services/data-management.service";
 
 export const getInitialDepartmentOfEnergyData = async () => {
   const data = await getInitialData().catch((e) => {
@@ -30,6 +40,23 @@ export const getDepartmentOfEnergyDataItem = async (
     throw e || new Error("Error fetching data from db");
   });
   return data;
+};
+
+export const addOrReplaceDbData = async (staleTime?: number) => {
+  const params: AddOrReplaceDbDataParams = {
+    modelName: "DepartmentOfEnergyDataItem",
+    getCountMethod: getCount,
+    dataSource: DataSources.DEPARTMENT_OF_ENERGY,
+    emptyTableMethod: emptyTable,
+    addSourceDataToDbMethod: addSourceDataToDbService,
+  };
+  if (staleTime !== undefined) {
+    params.staleTime = staleTime;
+  }
+  const result = await addOrReplaceDbDataService(params).catch((e) => {
+    throw e;
+  });
+  return result;
 };
 
 // export const getNewDepartmentOfEnergyDataFromSource = async (

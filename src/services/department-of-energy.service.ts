@@ -46,7 +46,8 @@ const db = {
   },
   create: async (data: Prisma.DepartmentOfEnergyDataItemCreateInput) => {},
   createMany: async (
-    data: Prisma.DepartmentOfEnergyDataItemCreateManyInput
+    data: Prisma.DepartmentOfEnergyDataItemCreateManyInput[],
+    skipDuplicates?: boolean
   ) => {
     const created = await prisma.departmentOfEnergyDataItem
       .createMany({
@@ -59,9 +60,33 @@ const db = {
     await prisma.$disconnect();
     return created;
   },
+  count: async () => {
+    const count = await prisma.departmentOfEnergyDataItem
+      .count()
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return count;
+  },
+  deleteMany: async (
+    select?: Prisma.DepartmentOfEnergyDataItemDeleteManyArgs
+  ) => {
+    const deleted = await prisma.departmentOfEnergyDataItem
+      .deleteMany(select)
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return deleted;
+  },
 };
 
-export const addSourceDataToDbService = async () => {
+export const addSourceDataToDbService = async (jsonData: {
+  dataset: Prisma.DepartmentOfEnergyDataItemCreateManyInput[];
+}) => {
   debugger;
   const currentDataFile = await getCurrentDataFile(
     DataSources.DEPARTMENT_OF_ENERGY
@@ -69,20 +94,20 @@ export const addSourceDataToDbService = async () => {
     throw e;
   });
 
-  if (!currentDataFile) {
-    throw new Error("No data file found");
-  }
+  // if (!currentDataFile) {
+  //   throw new Error("No data file found");
+  // }
 
-  const jsonDataBuffer = await fs.promises
-    .readFile(currentDataFile!)
-    .catch((e) => {
-      throw e;
-    });
+  // const jsonDataBuffer = await fs.promises
+  //   .readFile(currentDataFile!)
+  //   .catch((e) => {
+  //     throw e;
+  //   });
 
-  const bufferDataAsStringified = jsonDataBuffer && jsonDataBuffer.toString();
-  const jsonData =
-    bufferDataAsStringified && JSON.parse(bufferDataAsStringified);
-  jsonData.dataset = jsonData.dataset.map((item: any) => {
+  // const bufferDataAsStringified = jsonDataBuffer && jsonDataBuffer.toString();
+  // const jsonData =
+  //   bufferDataAsStringified && JSON.parse(bufferDataAsStringified);
+  jsonData.dataset = jsonData?.dataset?.map((item: any) => {
     let returnVal = {
       ...item,
       type: item["@type"],
@@ -96,7 +121,7 @@ export const addSourceDataToDbService = async () => {
   // debugger;
   // const testChunk = jsonData?.dataset.slice(0, 50);
   // const result = await db.createMany(jsonData.dataset).catch((e) => {
-  const result = await db.createMany(jsonData.dataset).catch((e) => {
+  const result = await db.createMany(jsonData?.dataset).catch((e) => {
     throw e;
   });
   return result;
@@ -181,4 +206,20 @@ export const getFullDataForItem = async (
     throw e;
   });
   return item;
+};
+
+export const getCount = async () => {
+  const count = await db.count().catch((e) => {
+    throw e;
+  });
+  return count;
+};
+
+export const emptyTable = async () => {
+  const result = db.deleteMany().catch(async (e) => {
+    await dbCatchMethod(e);
+    throw e;
+  });
+  await prisma.$disconnect();
+  return result;
 };
