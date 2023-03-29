@@ -88,11 +88,11 @@ export const addSourceDataToDbService = async (jsonData: {
   dataset: Prisma.DepartmentOfEnergyDataItemCreateManyInput[];
 }) => {
   debugger;
-  const currentDataFile = await getCurrentDataFile(
-    DataSources.DEPARTMENT_OF_ENERGY
-  ).catch((e) => {
-    throw e;
-  });
+  // const currentDataFile = await getCurrentDataFile(
+  //   DataSources.DEPARTMENT_OF_ENERGY
+  // ).catch((e) => {
+  //   throw e;
+  // });
 
   // if (!currentDataFile) {
   //   throw new Error("No data file found");

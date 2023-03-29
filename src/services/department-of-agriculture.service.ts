@@ -102,62 +102,80 @@ export const fetchNewData = async () => {
     });
 };
 
-const makeDbMethods = () => {
-  return {
-    getAll: async (select?: Prisma.DepartmentOfAgricultureDataItemSelect) => {
-      const items = await prisma.departmentOfAgricultureDataItem
-        .findMany({ select })
-        .catch(async (e) => {
-          await dbCatchMethod(e);
-          throw e;
-        });
-      await prisma.$disconnect();
-      return items;
-    },
-    getById: async (id: string) => {
-      const item = await prisma.departmentOfAgricultureDataItem
-        .findUniqueOrThrow({
-          where: {
-            id: id,
-          },
-        })
-        .catch(async (e) => {
-          await dbCatchMethod(e);
-          throw e;
-        });
-      await prisma.$disconnect();
-      return item;
-    },
-    create: async (data: Prisma.DepartmentOfAgricultureDataItemCreateInput) => {
-      const created = await prisma.departmentOfAgricultureDataItem
-        .create({
-          data,
-        })
-        .catch(async (e) => {
-          await dbCatchMethod(e);
-          throw e;
-        });
-      await prisma.$disconnect();
-      return created;
-    },
-    createMany: async (
-      data: Prisma.DepartmentOfAgricultureDataItemCreateInput[]
-    ) => {
-      const created = await prisma.departmentOfAgricultureDataItem
-        .createMany({
-          data,
-        })
-        .catch(async (e) => {
-          await dbCatchMethod(e);
-          throw e;
-        });
-      await prisma.$disconnect();
-      return created;
-    },
-  };
+const db = {
+  getAll: async (select?: Prisma.DepartmentOfAgricultureDataItemSelect) => {
+    const items = await prisma.departmentOfAgricultureDataItem
+      .findMany({ select })
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return items;
+  },
+  getById: async (id: string) => {
+    const item = await prisma.departmentOfAgricultureDataItem
+      .findUniqueOrThrow({
+        where: {
+          id: id,
+        },
+      })
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return item;
+  },
+  create: async (data: Prisma.DepartmentOfAgricultureDataItemCreateInput) => {
+    const created = await prisma.departmentOfAgricultureDataItem
+      .create({
+        data,
+      })
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return created;
+  },
+  createMany: async (
+    data: Prisma.DepartmentOfAgricultureDataItemCreateInput[]
+  ) => {
+    const created = await prisma.departmentOfAgricultureDataItem
+      .createMany({
+        data,
+      })
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return created;
+  },
+  count: async () => {
+    const count = await prisma.departmentOfAgricultureDataItem
+      .count()
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return count;
+  },
+  deleteMany: async (
+    select?: Prisma.DepartmentOfAgricultureDataItemDeleteManyArgs
+  ) => {
+    const deleted = await prisma.departmentOfAgricultureDataItem
+      .deleteMany(select)
+      .catch(async (e) => {
+        await dbCatchMethod(e);
+        throw e;
+      });
+    await prisma.$disconnect();
+    return deleted;
+  },
 };
-
-export const db = makeDbMethods();
 
 const initialDataSelect =
   Prisma.validator<Prisma.DepartmentOfAgricultureDataItemSelect>()({
@@ -208,4 +226,29 @@ export const getFullDataForItem = async (
     throw e;
   });
   return item;
+};
+
+export const getCount = async () => {
+  const count = await db.count().catch((e) => {
+    throw e;
+  });
+  return count;
+};
+
+export const emptyTable = async () => {
+  const result = db.deleteMany().catch(async (e) => {
+    await dbCatchMethod(e);
+    throw e;
+  });
+  await prisma.$disconnect();
+  return result;
+};
+
+export const addSourceDataToDbService = async (jsonData: {
+  dataset: Prisma.DepartmentOfAgricultureDataItemCreateManyInput[];
+}) => {
+  const result = await db.createMany(jsonData?.dataset).catch((e) => {
+    throw e;
+  });
+  return result;
 };

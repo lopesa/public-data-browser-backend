@@ -2,9 +2,16 @@ import express from "express";
 import {
   getInitialData,
   getFullDataForItem,
+  getCount,
+  emptyTable,
+  addSourceDataToDbService,
 } from "../services/department-of-agriculture.service";
 import validator from "validator";
-import { InitialIndexData } from "../types/types-general";
+import { DataSources, InitialIndexData } from "../types/types-general";
+import {
+  AddOrReplaceDbDataParams,
+  addOrReplaceDbData as addOrReplaceDbDataService,
+} from "../services/data-management.service";
 
 export const getInitialDepartmentOfAgricultureData =
   async (): Promise<InitialIndexData> => {
@@ -27,6 +34,23 @@ export const getDepartmentOfAgricultureDataItem = async (
     });
     return data;
   }
+};
+
+export const addOrReplaceDbData = async (staleTime?: number) => {
+  const params: AddOrReplaceDbDataParams = {
+    modelName: "DepartmentOfAgricultureDataItem",
+    getCountMethod: getCount,
+    dataSource: DataSources.DEPARTMENT_OF_AGRICULTURE,
+    emptyTableMethod: emptyTable,
+    addSourceDataToDbMethod: addSourceDataToDbService,
+  };
+  if (staleTime !== undefined) {
+    params.staleTime = staleTime;
+  }
+  const result = await addOrReplaceDbDataService(params).catch((e) => {
+    throw e;
+  });
+  return result;
 };
 
 // export const testPushDataToDb = async (

@@ -3,6 +3,7 @@ var router = express.Router();
 import {
   getInitialDepartmentOfAgricultureData,
   getDepartmentOfAgricultureDataItem,
+  addOrReplaceDbData,
 } from "../controllers/department-of-agriculture.controller";
 // import { checkTableForNulls, testPushDataToDb } from "../controllers/department-of-agriculture.controller";
 
@@ -15,9 +16,7 @@ router.get(
   ) => {
     const data = await getInitialDepartmentOfAgricultureData().catch((e) => {
       next(e || new Error("Error fetching data"));
-      // return res.status(500).send(e.message || "Error fetching data");
     });
-    // return res.status(200).json(data);
     data ? res.status(200).json(data) : next();
   }
 );
@@ -35,6 +34,23 @@ router.get(
       }
     );
     data ? res.status(200).json(data) : next();
+  }
+);
+
+router.post(
+  "/add-data-to-db",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const staleTime = req.body.staleTime && Number(req.body.staleTime);
+    const result = await addOrReplaceDbData(
+      typeof staleTime === "number" ? staleTime : undefined
+    ).catch((e) => {
+      next(e || new Error("Error adding data to db"));
+    });
+    result ? res.status(200).json(result) : next();
   }
 );
 
