@@ -14,6 +14,39 @@ export const dbCatchMethod = async (e: Error) => {
   // process.exit(1); // DO I NEED THIS???!?!?!?!?!?
 };
 
+// getAll: async (
+//   select?: Prisma.InternationalCoffeeOrganizationDataItemSelect
+// ) => {
+//   const items = await prisma.internationalCoffeeOrganizationDataItem
+//     .findMany({ select })
+//     .catch(async (e) => {
+//       await dbCatchMethod(e);
+//       throw e;
+//     });
+//   await prisma.$disconnect();
+//   return items;
+// },
+
+// type SelectMethodTypes = Prisma.InternationalCoffeeOrganizationDataItemSelect | Prisma.DepartmentOfAgricultureDataItemSelect | Prisma.DepartmentOfEnergyDataItemCreateInput;
+
+// type MethodTypes = typeof prisma.internationalCoffeeOrganizationDataItem | typeof prisma.departmentOfAgricultureDataItem | typeof prisma.departmentOfEnergyDataItem;
+
+// const SelectMethodTypesToMethodTypes: Record<SelectMethodTypes, MethodTypes> = {
+// }
+
+// export const makeGetAllMethod = (select: SelectMethodTypes, method: GetAllMethodTypes) => {
+//   return async (select: SelectMethodTypes) => {
+//       const items = await method
+//         .findMany({ select })
+//         .catch(async (e) => {
+//           await dbCatchMethod(e);
+//           throw e;
+//         });
+//       await prisma.$disconnect();
+//       return items;
+//     }
+// }
+
 // export const makeDbMethods = <DataType>() => {
 //   return {
 //     getAll: async () => {

@@ -1,0 +1,43 @@
+version: "3"
+services:
+  node:
+    container_name: public_data_browser_node
+    image: registry.digitalocean.com/ld-container-registry/publicdatabrowser-api:latest
+    restart: unless-stopped
+    env_file: .env
+    # image: node:18-alpine
+    # build:
+    #   context: .
+    #   no_cache: true
+    user: "node"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+    # working_dir: /home/node/app
+    # environment:
+    #   - NODE_ENV=development
+    # volumes:
+    #   - ./:/home/node/app
+    ports:
+      - 3001:3001
+    # command: bash -c "npm install && npm run dev:debug"
+    # command: sh -c "npm install && npm run dev:debug"
+  # proxy:
+  #   container_name: public_data_browser_proxy
+  #   image: testcab/cors-anywhere
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  db:
+    container_name: public_data_browser_db
+    image: mysql:8.0
+    # platform: linux/amd64 #for platform error on Apple M1 chips
+    ports:
+      - 3308:3308
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_TCP_PORT: 3308
+    volumes:
+      - public-data-browser-data:/var/lib/mysql
+volumes:
+  public-data-browser-data:

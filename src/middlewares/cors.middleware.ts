@@ -1,6 +1,10 @@
 import cors from "cors";
 
-const allowedOrigins = ["http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://www.publicdatabrowser.com",
+  "https://publicdatabrowser.com",
+];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins,

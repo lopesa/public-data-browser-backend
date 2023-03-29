@@ -9,12 +9,21 @@ import {
   getDepartmentOfEnergyDataItem,
 } from "../controllers/department-of-energy.controller";
 
-router.get("/", async (req: express.Request, res: express.Response) => {
-  const data = await getInitialDepartmentOfEnergyData().catch((e) => {
-    return res.status(500).send(e.message || "Error fetching data");
-  });
-  return res.status(200).json(data);
-});
+router.get(
+  "/",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const data = await getInitialDepartmentOfEnergyData().catch((e) => {
+      // return res.status(500).send(e.message || "Error fetching data");
+      next(e || new Error("Error fetching data"));
+    });
+    // return res.status(200).json(data);
+    data ? res.status(200).json(data) : next();
+  }
+);
 
 router.get(
   "/:id",

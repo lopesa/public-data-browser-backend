@@ -7,14 +7,23 @@ import {
 
 var router = express.Router();
 
-router.get("/", async (req: express.Request, res: express.Response) => {
-  const data = await getInitialInternationalCoffeeOrganizationData().catch(
-    (e) => {
-      return res.status(500).send(e.message || "Error fetching data");
-    }
-  );
-  return res.status(200).json(data);
-});
+router.get(
+  "/",
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    const data = await getInitialInternationalCoffeeOrganizationData().catch(
+      (e) => {
+        next(e || new Error("Error fetching data"));
+        // return res.status(500).send(e.message || "Error fetching data");
+      }
+    );
+    data ? res.status(200).json(data) : next();
+    // return res.status(200).json(data);
+  }
+);
 
 router.get(
   "/:id",
@@ -35,10 +44,16 @@ router.get(
 
 router.post(
   "/add-data-to-db",
-  async (req: express.Request, res: express.Response) => {
+  async (
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
     const result = await addICODataToDb(req, res).catch((e) => {
-      return res.status(500).send(e.message || "Error adding data to db");
+      next(e || new Error("Error adding data to db"));
+      // return res.status(500).send(e.message || "Error adding data to db");
     });
+    result ? res.status(200).json(result) : next();
   }
 );
 

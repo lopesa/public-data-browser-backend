@@ -1,6 +1,4 @@
 import express from "express";
-import { DataSources } from "../types/types-general";
-import { fetchNewData } from "../services/data-fetch.service";
 import {
   addSourceDataToDbFromFile,
   getFullDataForItem,
@@ -39,5 +37,5 @@ export const addICODataToDb = async (
   if (!(result?.count > 0)) {
     throw new Error("Error adding data to db");
   }
-  debugger;
+  return result;
 };

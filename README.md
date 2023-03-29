@@ -8,3 +8,4 @@ npx prisma migrate dev --name <name>
 - data-files.service: add to dataFileBaseNamesRecord const
 - add new model to Prisma schema, update db by prisma.push() or ultimately migrate
 - add router, controller, service, for new data source
+- basic functionality is well encapsulated by route: getall, getbyid and adddatatodb

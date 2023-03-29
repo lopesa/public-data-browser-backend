@@ -41,7 +41,6 @@ const db = {
     await prisma.$disconnect();
     return item;
   },
-  // create: async (data: Prisma.DepartmentOfEnergyDataItemCreateInput) => {},
   createMany: async (
     data: Prisma.InternationalCoffeeOrganizationDataItemCreateManyInput[]
   ) => {
@@ -58,6 +57,7 @@ const db = {
   },
 };
 
+// types for getInitialData
 const initialDataSelect =
   Prisma.validator<Prisma.InternationalCoffeeOrganizationDataItemSelect>()({
     id: true,
@@ -75,6 +75,10 @@ export interface InternationalCoffeeOrganizationIndexDataItem
   dataTypesByFileExtension?: string[];
 }
 
+/**
+ *
+ * @returns initial data for index page
+ */
 export const getInitialData = async (): Promise<InitialIndexData> => {
   const data = (await db.getAll(initialDataSelect).catch((e) => {
     throw e;
@@ -112,12 +116,16 @@ export const getFullDataForItem = async (
   return item;
 };
 
+/**
+ *
+ * @returns result of adding data to db
+ *
+ * admin tool to add data to db.
+ */
 export const addSourceDataToDbFromFile = async () => {
   if (!ICODataJson) {
     throw new Error("No data found");
   }
-  debugger;
-
   const result = await db.createMany(ICODataJson).catch((e) => {
     throw e || new Error("Error adding data to db");
   });
