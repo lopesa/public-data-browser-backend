@@ -35,6 +35,8 @@ app.use(
   internationalCoffeeOrganizationRouter
 );
 
+// this is essentially the built in Error Logger
+// default will not send error stack in prod
 app.use(
   (
     err: any,
@@ -46,5 +48,12 @@ app.use(
     res.status(500).send(err?.stack || "Something broke!");
   }
 );
+
+app.use((req, res, next) => {
+  // FELL ALL THE WAY THROUGH!!
+  // @TODO: add logging here
+  // nothing should fall through to here
+  res.status(500).send("Something broke!");
+});
 
 export default app;

@@ -95,7 +95,7 @@ export const addOrReplaceDbData = async (params: AddOrReplaceDbDataParams) => {
     hoursSinceLastUpdate !== null &&
     hoursSinceLastUpdate < staleTime
   ) {
-    return "data not updated - not needed";
+    return "data not updated - not needed, still fresh";
   }
 
   const count = await getCountMethod().catch((e) => {
