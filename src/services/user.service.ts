@@ -14,7 +14,6 @@ const db = {
     return created;
   },
   getUser: async (select: Prisma.UserWhereUniqueInput) => {
-    debugger;
     const user = await prisma.user
       .findUnique({
         where: select,
@@ -39,7 +38,6 @@ const db = {
         throw e;
       });
     await prisma.$disconnect();
-    debugger;
     return updated;
   },
 };

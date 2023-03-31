@@ -5,6 +5,7 @@ import {
   getDepartmentOfAgricultureDataItem,
   addOrReplaceDbData,
 } from "../controllers/department-of-agriculture.controller";
+import passport from "passport";
 // import { checkTableForNulls, testPushDataToDb } from "../controllers/department-of-agriculture.controller";
 
 router.get(
@@ -39,6 +40,7 @@ router.get(
 
 router.post(
   "/add-data-to-db",
+  passport.authenticate("jwt", { session: false }),
   async (
     req: express.Request,
     res: express.Response,
@@ -66,11 +68,5 @@ router.post(
 //     return res.status(200).json(nullFields);
 //   }
 // );
-
-// router.get("/test", async (req: express.Request, res: express.Response) => {
-//   await testPushDataToDb(req, res).catch((e) => {
-//     res.status(500).send(e.message || "Error fetching data");
-//   });
-// });
 
 export default router;

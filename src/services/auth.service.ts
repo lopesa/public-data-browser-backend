@@ -16,29 +16,29 @@ import { JwtTokenUser } from "../types/types-general";
 const localStrategy = Strategy.Strategy;
 const JWT_VALID_TIME = "1d";
 
-passport.use(
-  "signup",
-  new localStrategy(
-    {
-      usernameField: "email",
-      passwordField: "password",
-    },
-    async (email, password, done) => {
-      const userExists = await getUserByEmail(email).catch((e) => {
-        done(new Error("problem checking user exists"), false);
-      });
-      if (userExists) {
-        return done(new Error("User already exists"), false);
-      }
-      const user = await createUser(email, password).catch((e) => {
-        done(e);
-      });
-      return user
-        ? done(null, user)
-        : done(new Error("Problem Creating User"), false);
-    }
-  )
-);
+// passport.use(
+//   "signup",
+//   new localStrategy(
+//     {
+//       usernameField: "email",
+//       passwordField: "password",
+//     },
+//     async (email, password, done) => {
+//       const userExists = await getUserByEmail(email).catch((e) => {
+//         done(new Error("problem checking user exists"), false);
+//       });
+//       if (userExists) {
+//         return done(new Error("User already exists"), false);
+//       }
+//       const user = await createUser(email, password).catch((e) => {
+//         done(e);
+//       });
+//       return user
+//         ? done(null, user)
+//         : done(new Error("Problem Creating User"), false);
+//     }
+//   )
+// );
 
 passport.use(
   "login",

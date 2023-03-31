@@ -2,51 +2,49 @@ import { User } from "@prisma/client";
 import express from "express";
 var router = express.Router();
 import passport from "passport";
+import { createNewUserWithEmailAndPassword } from "../controllers/user.controller";
 import { generateJWT } from "../services/auth.service";
+import { JwtTokenUser } from "../types/types-general";
 
 router.post("/signup", async (req, res, next) => {
-  passport.authenticate(
-    "signup",
-    { session: false, failWithError: true },
-
-    async (err: Error, user: User, info?: { message: string }) => {
-      if (err || !user) {
-        return next(err || new Error("Problem Authenticating"));
-      }
-      const body = { _id: user.id, email: user.email };
-      const token = generateJWT(body);
-      return token
-        ? res.json({ token, email: user.email })
-        : next(new Error("Account created, but Problem creating token"));
-    }
-  )(req, res, next);
+  const email = req.body.email;
+  const password = req.body.password;
+  if (!email || !password) {
+    return next(new Error("Email and password required"));
+  }
+  const newUserToken = await createNewUserWithEmailAndPassword(
+    email,
+    password
+  ).catch((e) => {
+    return next(e);
+  });
+  if (!newUserToken) {
+    return next(new Error("Problem creating user"));
+  }
+  return res.status(200).send({ token: newUserToken, email });
 });
 
-router.post("/login", async (req, res, next) => {
-  passport.authenticate(
-    "login",
-    async (err: Error, user: User, info?: { message: string }) => {
-      if (err || !user) {
-        return next(err || new Error("Problem Authenticating"));
-      }
-      req.login(user, { session: false }, async (error) => {
-        if (error) return next(error);
+router.post(
+  "/login",
+  passport.authenticate("login", { session: false }),
+  async (req, res, next) => {
+    const body = {
+      _id: (req.user as User)?.id,
+      email: (req.user as User)?.email,
+    };
+    const token = generateJWT(body);
 
-        const body = { _id: user.id, email: user.email };
-        const token = generateJWT(body);
-
-        return token
-          ? res.json({ token, email: user.email })
-          : next(new Error("Problem creating token"));
-      });
-    }
-  )(req, res, next);
-});
+    return token
+      ? res.json({ token, email: (req.user as JwtTokenUser).email })
+      : next(new Error("Problem creating token"));
+  }
+);
 
 router.get(
   "/profile",
   passport.authenticate("jwt", { session: false }),
   (req, res, next) => {
+    req.logOut(() => {});
     res.json({
       message: "You made it to the secure route",
       user: req.user,

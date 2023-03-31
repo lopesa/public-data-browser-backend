@@ -175,6 +175,10 @@ export const getInitialDataForBookmarks = async (bookmarkIds: string[]) => {
 };
 
 export const getInitialUserBookmarkDataByUserId = async (id: string) => {
+  if (!id)
+    throw new Error(
+      "No user id provided. (getInitialUserBookmarkDataByUserId)"
+    );
   return await db
     .getBookmarks(
       {

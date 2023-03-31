@@ -1,6 +1,7 @@
 import express from "express";
 import { Stats } from "fs";
 var router = express.Router();
+import passport from "passport";
 
 import {
   // getNewDepartmentOfEnergyDataFromSource,
@@ -10,6 +11,7 @@ import {
   getDepartmentOfEnergyDataItem,
   addOrReplaceDbData,
 } from "../controllers/department-of-energy.controller";
+import { JwtTokenUser } from "../types/types-general";
 
 router.get(
   "/",
@@ -43,13 +45,13 @@ router.get(
 
 router.post(
   "/add-data-to-db",
-  async (
-    req: express.Request,
-    res: express.Response,
-    next: express.NextFunction
-  ) => {
-    const staleTime = req.body.staleTime && Number(req.body.staleTime);
-    debugger;
+  passport.authenticate("jwt", { session: false }),
+  async (req, res, next) => {
+    if ((req.user as JwtTokenUser)?.email !== "tony@lopesdesign.com") {
+      next();
+      return;
+    }
+    const staleTime = req.body?.staleTime && Number(req.body?.staleTime);
     const result = await addOrReplaceDbData(
       typeof staleTime === "number" ? staleTime : undefined
     ).catch((e) => {
@@ -58,26 +60,6 @@ router.post(
     result ? res.status(200).json(result) : next();
   }
 );
-
-// router.get(
-//   "/get-new-data-from-source",
-//   async (req: express.Request, res: express.Response) => {
-//     await getNewDepartmentOfEnergyDataFromSource(req, res).catch((e) => {
-//       return res.status(500).send(e.message || "Error fetching data");
-//     });
-//     return res.status(200).send("ok");
-//   }
-// );
-
-// router.get(
-//   "/add-source-data-to-db",
-//   async (req: express.Request, res: express.Response) => {
-//     const data = await addSourceDataToDb(req, res).catch((e) => {
-//       return res.status(500).send(e.message || "Error fetching data");
-//     });
-//     return res.status(200).json(data);
-//   }
-// );
 
 // router.get(
 //   "/check-for-nulls",

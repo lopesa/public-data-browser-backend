@@ -129,31 +129,9 @@ export const addOrReplaceDbData = async (params: AddOrReplaceDbDataParams) => {
     throw new Error("Error adding data to db");
   }
 
-  const updated = await updateDataSourceInfo(
-    "DepartmentOfEnergyDataItem"
-  ).catch((e) => {
+  const updated = await updateDataSourceInfo(modelName).catch((e) => {
     throw e || new Error("Error updating DataSource data in db");
   });
 
   return "data updated";
-
-  // see if item is in DataSources
-  // if not, start the add process
-  // ADD PROCESS
-  // check to see if there's any data in table
-  // get new data from source
-  // if data retrieved from source
-  // export current data into a file to enable undo
-  // check data length is similar to current data
-  // if not , warn before continuing
-  // replace current data with new data
-  // update DataSources
-
-  // if it is
-  // check if there is any data in its table
-  // if not start the add process
-  // if so, check the added date from DataSources
-  // if it's been more than X hours/days, start the add process
-  // update Datasources
-  // if not, return
 };

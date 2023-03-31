@@ -87,7 +87,7 @@ const db = {
 export const addSourceDataToDbService = async (jsonData: {
   dataset: Prisma.DepartmentOfEnergyDataItemCreateManyInput[];
 }) => {
-  debugger;
+  // debugger;
   // const currentDataFile = await getCurrentDataFile(
   //   DataSources.DEPARTMENT_OF_ENERGY
   // ).catch((e) => {
