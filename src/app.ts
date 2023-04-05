@@ -4,6 +4,7 @@ import loggingFunction from "./middlewares/logging.middleware";
 import corsMiddleware from "./middlewares/cors.middleware";
 import * as dotenv from "dotenv";
 import compression from "compression";
+import helmet from "helmet";
 
 import indexRouter from "./routes/index";
 import departmentOfAgricultureRouter from "./routes/department-of-agriculture.router";
@@ -20,6 +21,7 @@ const app = express();
 app.use(corsMiddleware());
 app.use(compression());
 app.use(loggingFunction());
+app.use(helmet());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
