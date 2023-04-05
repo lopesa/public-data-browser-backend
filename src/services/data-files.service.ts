@@ -45,3 +45,28 @@ export const writeSourceDataFileWithTimeStamp = async (
       throw e;
     });
 };
+
+export const getDataFromDatasourceFile = async (dataSource: DataSources) => {
+  const currentDataFile = await getCurrentDataFile(dataSource).catch((e) => {
+    throw e || new Error("No data file found");
+  });
+
+  if (!currentDataFile) {
+    throw new Error("No data file found");
+  }
+
+  // fs.rmSync(currentDataFile, {
+  //   force: true,
+  // });
+
+  const jsonDataBuffer = await fs.promises
+    .readFile(currentDataFile!)
+    .catch((e) => {
+      throw e;
+    });
+
+  const bufferDataAsStringified = jsonDataBuffer && jsonDataBuffer.toString();
+  const jsonData =
+    bufferDataAsStringified && JSON.parse(bufferDataAsStringified);
+  return jsonData;
+};

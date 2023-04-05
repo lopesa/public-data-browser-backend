@@ -11,6 +11,7 @@ import {
   updateDataSourceInfo,
 } from "./data-source.service";
 import { fetchNewData } from "./data-fetch.service";
+import { getDataFromDatasourceFile } from "./data-files.service";
 
 /**
  *
@@ -102,7 +103,10 @@ export const addOrReplaceDbData = async (params: AddOrReplaceDbDataParams) => {
     throw e || new Error("Error fetching Count for Dept of Energy from db");
   });
 
-  const sourceData = await fetchNewData(dataSource).catch((e) => {
+  // const sourceData = await fetchNewData(dataSource).catch((e) => {
+  //   throw e;
+  // });
+  const sourceData = await getDataFromDatasourceFile(dataSource).catch((e) => {
     throw e;
   });
   if (!sourceData) {
