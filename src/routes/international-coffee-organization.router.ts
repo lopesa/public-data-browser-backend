@@ -6,6 +6,7 @@ import {
   getInternationalCoffeeOrganizationDataItem,
 } from "../controllers/international-coffee-organization.controller";
 import { JwtTokenUser } from "../types/types-general";
+import passport from "passport";
 
 var router = express.Router();
 
@@ -46,6 +47,7 @@ router.get(
 
 router.post(
   "/add-data-to-db",
+  passport.authenticate("jwt", { session: false }),
   async (
     req: express.Request,
     res: express.Response,
