@@ -97,6 +97,34 @@ model DepartmentOfEnergyDataItem {
   @@index(fields: [title], map: "title_index")
 }
 
+model DepartmentOfTreasuryDataItem {
+  id          String   @id @default(uuid())
+  type String?
+  identifier  String?   @unique
+  accessLevel String?
+  contactPoint Json?
+  programCode Json?
+  description String? @db.LongText
+  title       String? @db.VarChar(500)
+  distribution Json?
+  license     String?
+  bureauCode  Json?
+  modified    Json?
+  publisher   Json?
+  accrualPeriodicity String?
+  keyword     Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  describedBy Json?
+  issued Json?
+  rights String?  @db.VarChar(500)
+  landingPage String? @db.VarChar(500)
+  references Json?
+  theme Json?
+  primaryITInvestmentUII String?
+  @@index(fields: [title], map: "title_index")
+}
+
 model BookmarkItem {
   id          String   @id @default(uuid())
   originalSource String

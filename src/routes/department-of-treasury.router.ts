@@ -4,13 +4,10 @@ import passport from "passport";
 import { adminUsersByEmail } from "../configs/constants";
 
 import {
-  // getNewDepartmentOfEnergyDataFromSource,
-  // addSourceDataToDb,
-  // checkTableForNulls,
-  getInitialDepartmentOfEnergyData,
-  getDepartmentOfEnergyDataItem,
+  getInitialDepartmentOfTreasuryData,
+  getDepartmentOfTreasuryDataItem,
   addOrReplaceDbData,
-} from "../controllers/department-of-energy.controller";
+} from "../controllers/department-of-treasury.controller";
 import { JwtTokenUser } from "../types/types-general";
 import { winstonLogger } from "../middlewares/logging.middleware";
 
@@ -21,7 +18,7 @@ router.get(
     res: express.Response,
     next: express.NextFunction
   ) => {
-    const data = await getInitialDepartmentOfEnergyData().catch((e) => {
+    const data = await getInitialDepartmentOfTreasuryData().catch((e) => {
       next(e || new Error("Error fetching data"));
     });
     data ? res.status(200).json(data) : next(new Error("Error fetching data"));
@@ -35,7 +32,7 @@ router.get(
     res: express.Response,
     next: express.NextFunction
   ) => {
-    const data = await getDepartmentOfEnergyDataItem(req, res).catch((e) => {
+    const data = await getDepartmentOfTreasuryDataItem(req, res).catch((e) => {
       next(e || new Error("Error fetching data"));
     });
     data ? res.status(200).json(data) : next(new Error("Error fetching data"));

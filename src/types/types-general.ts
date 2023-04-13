@@ -10,6 +10,7 @@ import icoDataJson from "../data/international-coffee-organization.json";
 export enum DataSources {
   DEPARTMENT_OF_AGRICULTURE,
   DEPARTMENT_OF_ENERGY,
+  DEPARTMENT_OF_TREASURY,
   INTERNATIONAL_COFFEE_ORGANIZATION,
 }
 
@@ -22,6 +23,7 @@ type DatasourceMetadata = {
 export type DataSourceModelNames =
   | "DepartmentOfAgricultureDataItem"
   | "DepartmentOfEnergyDataItem"
+  | "DepartmentOfTreasuryDataItem"
   | "InternationalCoffeeOrganizationDataItem";
 
 export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
@@ -35,6 +37,11 @@ export const DataSourceMetadataRecord: Record<DataSources, DatasourceMetadata> =
       originalJsonDataUrl:
         "https://www.energy.gov/sites/default/files/2023-01/pdl010123.json",
       originalInitialUrl: "https://data.gov/metrics.html",
+    },
+    [DataSources.DEPARTMENT_OF_TREASURY]: {
+      originalJsonDataUrl: "http://www.treasury.gov/data.json",
+      originalInitialUrl:
+        "https://catalog.data.gov/harvest/about/treasury-json",
     },
     [DataSources.INTERNATIONAL_COFFEE_ORGANIZATION]: {
       originalJsonData: icoDataJson,

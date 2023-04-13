@@ -1,6 +1,8 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import loggingFunction from "./middlewares/logging.middleware";
+import loggingFunction, {
+  winstonLogger,
+} from "./middlewares/logging.middleware";
 import corsMiddleware from "./middlewares/cors.middleware";
 import * as dotenv from "dotenv";
 import compression from "compression";
@@ -12,6 +14,7 @@ import departmentOfEnergyRouter from "./routes/department-of-energy.router";
 import userRouter from "./routes/user.router";
 import bookmarksRouter from "./routes/bookmarks.router";
 import internationalCoffeeOrganizationRouter from "./routes/international-coffee-organization.router";
+import departmentOfTreasuryRouter from "./routes/department-of-treasury.router";
 
 require("./services/auth.service");
 
@@ -32,6 +35,7 @@ app.use("/user", userRouter);
 app.use("/bookmarks", bookmarksRouter);
 app.use("/department-of-agriculture", departmentOfAgricultureRouter);
 app.use("/department-of-energy", departmentOfEnergyRouter);
+app.use("/department-of-treasury", departmentOfTreasuryRouter);
 app.use(
   "/international-coffee-organization",
   internationalCoffeeOrganizationRouter
@@ -46,8 +50,15 @@ app.use(
     res: express.Response,
     next: express.NextFunction
   ) => {
-    console.error(err.stack);
-    res.status(500).send(err?.stack || "Something broke!");
+    winstonLogger.log({
+      level: "error",
+      message: err?.message || "Something broke - server side",
+    });
+    let response =
+      process.env.NODE_ENV === "development" ? err?.stack : undefined;
+    response = response || "Something broke! - server side";
+
+    res.status(500).send(response);
   }
 );
 
@@ -55,7 +66,21 @@ app.use((req, res, next) => {
   // FELL ALL THE WAY THROUGH!!
   // @TODO: add logging here
   // nothing should fall through to here
-  res.status(500).send("Something broke!");
+  winstonLogger.log({
+    level: "error",
+    message: "Something broke! - fell all the way through",
+  });
+  // winstonLogger.log({ level: "error", message: JSON.stringify(req.params) });
+  // winstonLogger.log({ level: "error", message: JSON.stringify(req.baseUrl) });
+  // winstonLogger.log({ level: "error", message: JSON.stringify(req.body) });
+  // winstonLogger.log({ level: "error", message: JSON.stringify(req.hostname) });
+  // winstonLogger.log({
+  //   level: "error",
+  //   message: JSON.stringify(req.originalUrl),
+  // });
+  // winstonLogger.log({ level: "error", message: JSON.stringify(req.path) });
+  // winstonLogger.log({ level: "error", message: JSON.stringify(req.route) });
+  res.status(500).send("Something broke! - server side");
 });
 
 export default app;
