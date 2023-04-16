@@ -58,6 +58,12 @@ router.post(
   }
 );
 
+/**
+ * used during initial inport of data
+ * add an exhaustive list of all fields, then check for nulls
+ * and remove them
+ */
+
 // router.get(
 //   "/check-for-nulls",
 //   async (req: express.Request, res: express.Response) => {

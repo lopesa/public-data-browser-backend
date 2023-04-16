@@ -4,9 +4,6 @@ import passport from "passport";
 import { adminUsersByEmail } from "../configs/constants";
 
 import {
-  // getNewDepartmentOfEnergyDataFromSource,
-  // addSourceDataToDb,
-  // checkTableForNulls,
   getInitialDepartmentOfEnergyData,
   getDepartmentOfEnergyDataItem,
   addOrReplaceDbData,
@@ -60,18 +57,5 @@ router.post(
       : next(new Error("Error fetching data"));
   }
 );
-
-// router.get(
-//   "/check-for-nulls",
-//   async (req: express.Request, res: express.Response) => {
-//     debugger;
-//     const nullFields = await checkTableForNulls(req, res).catch((e) => {
-//       return res
-//         .status(500)
-//         .send(e.message || "Error fetching data in check for nulls");
-//     });
-//     return res.status(200).json(nullFields);
-//   }
-// );
 
 export default router;

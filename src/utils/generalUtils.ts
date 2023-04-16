@@ -48,3 +48,16 @@ export const getDataTypesByFileExtension = (distribution: any) => {
   });
   return dataTypesByFileExtension;
 };
+
+export const removeAmpersandFromTypeProp = (
+  dataset: { [key: string]: any }[]
+) => {
+  return dataset?.map((item: any) => {
+    let returnVal = {
+      ...item,
+      type: item["@type"],
+    };
+    delete returnVal["@type"];
+    return returnVal;
+  });
+};

@@ -3,18 +3,14 @@ import {
   Prisma,
   DepartmentOfEnergyDataItem,
 } from "@prisma/client";
-import { getCurrentDataFile } from "./data-files.service";
 import {
   DataSources,
   DataSourceMetadataRecord,
   InitialIndexData,
   InitialIndexDataItem,
 } from "../types/types-general";
-import fs from "fs";
-// import { makeDbMethods } from "./db.service";
 import { dbCatchMethod } from "./db.service";
-import { getDataTypesByFileExtension } from "../utils/generalUtils";
-import { PartialBy } from "../types/types-helpers";
+import { removeAmpersandFromTypeProp } from "../utils/generalUtils";
 import { parseDataItemForIndexDataForUSGovData } from "./data-management.service";
 
 const prisma = new PrismaClient();
@@ -87,49 +83,33 @@ const db = {
 export const addSourceDataToDbService = async (jsonData: {
   dataset: Prisma.DepartmentOfEnergyDataItemCreateManyInput[];
 }) => {
-  // debugger;
+  let data = jsonData.dataset;
+  data = data && removeAmpersandFromTypeProp(data);
+  const result = await db.createMany(data).catch((e) => {
+    throw e;
+  });
+  return result;
+  // example of initial idea of writing to files also
+  // goes alongside the data-files service
+  // @TODO look to remove this and that service eventually
+
   // const currentDataFile = await getCurrentDataFile(
   //   DataSources.DEPARTMENT_OF_ENERGY
   // ).catch((e) => {
   //   throw e;
   // });
-
   // if (!currentDataFile) {
   //   throw new Error("No data file found");
   // }
-
   // const jsonDataBuffer = await fs.promises
   //   .readFile(currentDataFile!)
   //   .catch((e) => {
   //     throw e;
   //   });
-
   // const bufferDataAsStringified = jsonDataBuffer && jsonDataBuffer.toString();
   // const jsonData =
   //   bufferDataAsStringified && JSON.parse(bufferDataAsStringified);
-  jsonData.dataset = jsonData?.dataset?.map((item: any) => {
-    let returnVal = {
-      ...item,
-      type: item["@type"],
-    };
-    delete returnVal["@type"];
-    return returnVal;
-  });
-  // const longestRights = jsonData?.dataset.reduce((acc: number, curr: any) => {
-  //   return curr.rights?.length > acc ? curr.rights?.length : acc;
-  // }, 0);
-  // debugger;
-  // const testChunk = jsonData?.dataset.slice(0, 50);
-  // const result = await db.createMany(jsonData.dataset).catch((e) => {
-  const result = await db.createMany(jsonData?.dataset).catch((e) => {
-    throw e;
-  });
-  return result;
-  //   const all = await db.getAll().catch((e) => {
-  //     res.status(200).json(e.message);
-  //   });
-
-  //   return res.status(200).json(all);
+  // EXAMPLE END
 };
 
 /**

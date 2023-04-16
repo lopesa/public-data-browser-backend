@@ -1,7 +1,7 @@
 import express from "express";
 import { DataSources } from "../types/types-general";
 import {
-  addSourceDataToDbService,
+  addSourceDataToDb,
   emptyTable,
   getAll,
   getCount,
@@ -15,6 +15,8 @@ import {
   checkForNulls,
 } from "../services/data-management.service";
 import { DepartmentOfTreasuryDataItem } from "@prisma/client";
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 export const getInitialDepartmentOfTreasuryData = async () => {
   const data = await getInitialData().catch((e) => {
@@ -43,7 +45,7 @@ export const addOrReplaceDbData = async (staleTime?: number) => {
     getCountMethod: getCount,
     dataSource: DataSources.DEPARTMENT_OF_TREASURY,
     emptyTableMethod: emptyTable,
-    addSourceDataToDbMethod: addSourceDataToDbService,
+    addSourceDataToDbMethod: addSourceDataToDb,
   };
   if (staleTime !== undefined) {
     params.staleTime = staleTime;

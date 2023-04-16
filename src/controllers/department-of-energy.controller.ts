@@ -13,6 +13,8 @@ import {
   addOrReplaceDbData as addOrReplaceDbDataService,
 } from "../services/data-management.service";
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 export const getInitialDepartmentOfEnergyData = async () => {
   const data = await getInitialData().catch((e) => {
     throw e;

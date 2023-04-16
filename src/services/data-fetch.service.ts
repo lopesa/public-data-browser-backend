@@ -45,3 +45,37 @@ export const fetchNewData = async (dataSource: DataSources) => {
   //   throw e;
   // });
 };
+
+/**
+ * not used any more, relocated to this service for convenience
+ * this isn't where it was when it was workikng
+ */
+// export const getShouldFetchNewData = async () => {
+//   const currentDataFileFolderExists = !!(await fs.promises
+//     .readdir(`./${BASE_DIR}/${BASE_FOLDER}`)
+//     .catch((e) => {
+//       return false;
+//     }));
+
+//   if (!currentDataFileFolderExists) {
+//     await fs.promises.mkdir(`./${BASE_DIR}/${BASE_FOLDER}`);
+//     return true;
+//   }
+
+//   const currentDataFile = await getCurrentDataFile().catch((e) => {
+//     throw e;
+//   });
+
+//   if (!currentDataFile) {
+//     return true;
+//   }
+//   const lastDownloadDate = Number(
+//     currentDataFile.slice(
+//       currentDataFile.lastIndexOf("_") + 1,
+//       currentDataFile.lastIndexOf(".")
+//     )
+//   );
+//   const todaysDate = Date.now();
+
+//   return diff_hours(lastDownloadDate, todaysDate) > MAX_HOURS_BEFORE_REFETCH;
+// };

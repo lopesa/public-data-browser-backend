@@ -8,7 +8,6 @@ import {
 import passport from "passport";
 import { JwtTokenUser } from "../types/types-general";
 import { adminUsersByEmail } from "../configs/constants";
-// import { checkTableForNulls, testPushDataToDb } from "../controllers/department-of-agriculture.controller";
 
 router.get(
   "/",
@@ -58,18 +57,5 @@ router.post(
       : next(new Error("Error fetching data"));
   }
 );
-
-// router.get(
-//   "/check-for-nulls",
-//   async (req: express.Request, res: express.Response) => {
-//     debugger;
-//     const nullFields = await checkTableForNulls(req, res).catch((e) => {
-//       return res
-//         .status(500)
-//         .send(e.message || "Error fetching data in check for nulls");
-//     });
-//     return res.status(200).json(nullFields);
-//   }
-// );
 
 export default router;
